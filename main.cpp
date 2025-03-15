@@ -215,14 +215,26 @@ void readCate(){
     return;
 }
 
+// Hàm loại bỏ ký tự không phải chữ cái và số
+string removeSpecialChars(const string &input) {
+    string result;
+    for (char ch : input) {
+        if (isalnum(ch) || ch == ' ' || ch == '.') {  // Giữ lại chữ cái, số và khoảng trắng, dấu chấm
+            result += ch;
+        }
+    }
+    return result;
+}
+
 node makeNode(){
 	Customer cus;
 	cout<<"Nhap thong tin khach hang: "<<endl;
 	fflush(stdin);
 
 	cout<<"Nhap ten khach hang: ";
-	//cin.ignore(); // Xóa ký tự '\n' còn lại trong bộ đệm
+	cin.ignore(); // Xóa ký tự '\n' còn lại trong bộ đệm
 	getline(cin,cus.name);cus.name=chuanhoachu(cus.name);
+	cus.name = removeSpecialChars(cus.name);
 	fflush(stdin);
 
 	cout<<"Nhap tuoi khach hang: ";
