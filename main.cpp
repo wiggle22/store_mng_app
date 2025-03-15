@@ -6,7 +6,6 @@
 #include <termios.h>
 #include <unistd.h>
 #include <fcntl.h>
-//#include <windows.h>
 #include <iomanip>
 #include <ctime>
 #include <sstream>
