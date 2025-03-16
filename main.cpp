@@ -57,7 +57,7 @@ string chuanhoachu(string &a){
     // Thay th? ch? "Iphone" b?ng "iPhone"
     size_t pos = a.find("Iphone");
     if (pos != std::string::npos) {
-        a.replace(pos, 6, "iPhone");
+        a.replace(pos, 7, "iPhone");
     }
 
     return a;
@@ -232,9 +232,9 @@ node makeNode() {
 
     cout << "Nhap ten khach hang: ";
     getline(cin.ignore(), cus.name);
-    cus.name = chuanhoachu(cus.name);
+	cus.name = removeSpecialChars(cus.name);
+    //cus.name = chuanhoachu(cus.name);
 	
-
     cout << "Nhap tuoi khach hang: ";
     cin >> cus.age;
     cus.age = chuanhoatuoi(cus.age);
@@ -251,7 +251,8 @@ node makeNode() {
     {
         cout<<"Nhap mon hang: "; 
         getline(cin,cus.item);
-		cus.item=chuanhoachu(cus.item);
+		cus.item = removeSpecialChars(cus.item);
+		//cus.item=chuanhoachu(cus.item);
 
         ifstream myfile("danhmuc.txt");
         string line;
@@ -278,8 +279,7 @@ node makeNode() {
     {
         cout<<"Nhap dung luong dien thoai: ";
         cin>>cus.storage;
-		cus.storage = cus.storage + "GB";
-
+		cus.storage = removeSpecialChars(cus.storage);
         ifstream myfile("danhmuc.txt");
         string line;
 
@@ -757,7 +757,7 @@ Menu::Menu() {
 
 void Menu::printMenu() {
     for (int i = 0; i < _numberOfItem; i++) {
-        gotoxy(3, 6 + i);
+        gotoxy(3, 7 + i);
         cout << item[i];
         usleep(100000); // Dừng 100ms
     }
@@ -778,12 +778,14 @@ int main(){
 	string mode;
 	Menu menu;
 	int x;
-	int line = 6; //V? tr? d?ng c?a menu
+	int line = 7; //Vi tri bat dau cua pointer
 	bool thoat = false;
 
 
 	cout << "\n=============================================================";
-	cout << "\n\t\tDanh sach quan ly khach hang tai cua hang dien thoai chuyen ban iPhone";
+	cout << "\n \t\t--------------------------------------------------------------------------";
+	cout << "\n\t\t| Danh sach quan ly khach hang tai cua hang dien thoai chuyen ban iPhone |";
+	cout << "\n \t\t--------------------------------------------------------------------------\n";
 	menu.printMenu();
 	cout << "\n=============================================================";
 
@@ -801,7 +803,7 @@ int main(){
 
 				case 3: {
 						line++;
-						if (line >= menu.numberOfItem()+6) line = 6;
+						if (line >= menu.numberOfItem()+7) line = 7;
 						break;
 					}
 
@@ -809,19 +811,19 @@ int main(){
 
 				case 4: {
 						line--;
-						if (line < 6) line = menu.numberOfItem() + 6 - 1;
+						if (line < 7) line = menu.numberOfItem() + 7 - 1;
 						break;
 					}
 
 				case 5:{
-						gotoxy(0, 15);
-						if(menu.getItem()[line-6] == "1. Nhap thong tin khach hang")
+						gotoxy(0, 16);
+						if(menu.getItem()[line-7] == "1. Nhap thong tin khach hang")
 							insertCustomer(head);
-						else if (menu.getItem()[line-6] == "2. Xoa thong tin khach hang")
+						else if (menu.getItem()[line-7] == "2. Xoa thong tin khach hang")
 							deleteCustomer(head);
-						else if (menu.getItem()[line-6] == "3. Xoa tat ca thong tin khach hang")
+						else if (menu.getItem()[line-7] == "3. Xoa tat ca thong tin khach hang")
 							deleteAllCustomer(head);
-						else if (menu.getItem()[line-6] == "4. Tim kiem thong tin khach hang"){
+						else if (menu.getItem()[line-7] == "4. Tim kiem thong tin khach hang"){
 							string choice;
 							cout<<"1. Tim kiem theo so dien thoai khach hang\n";
 							cout<<"2. Tim kiem theo san pham\n"; 
@@ -831,13 +833,13 @@ int main(){
 							else if(choice == "2")
 								printInfoByItem(head);
 						}
-						else if (menu.getItem()[line-6] == "5. Thong tin tat ca khach hang")
+						else if (menu.getItem()[line-7] == "5. Thong tin tat ca khach hang")
 							printInfo(head);
-						else if (menu.getItem()[line-6] == "6. Danh muc san pham")
+						else if (menu.getItem()[line-7] == "6. Danh muc san pham")
 							readCate();
-						else if (menu.getItem()[line-6] == "7. Thay doi thong tin khach hang")
+						else if (menu.getItem()[line-7] == "7. Thay doi thong tin khach hang")
 							changeCustomer(head);
-						else if (menu.getItem()[line-6] == "8. Het gio lam"){
+						else if (menu.getItem()[line-7] == "8. Het gio lam"){
 							system("clear");
 							cout<<"******* Chuc mot ngay tot lanh *******"<<endl;
 							cout<<"************ Hen gap lai *************"<<endl;
@@ -848,7 +850,9 @@ int main(){
 						system("read -p 'Nhan phim bat ky de tiep tuc...' var");
 						system("clear");
 						cout << "\n=============================================================";
-						cout << "\n\t\tDanh sach quan ly khach hang tai cua hang dien thoai chuyen ban iPhone";
+						cout << "\n \t\t--------------------------------------------------------------------------";
+						cout << "\n\t\t| Danh sach quan ly khach hang tai cua hang dien thoai chuyen ban iPhone |";
+						cout << "\n \t\t--------------------------------------------------------------------------\n";
 						menu.printMenu();
 						cout << "\n=============================================================";
 						break;
