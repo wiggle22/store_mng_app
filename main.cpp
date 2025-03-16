@@ -57,7 +57,7 @@ string chuanhoachu(string &a){
     // Thay th? ch? "Iphone" b?ng "iPhone"
     size_t pos = a.find("Iphone");
     if (pos != std::string::npos) {
-        a.replace(pos, 6, "iPhone");
+        a.replace(pos, 7, "iPhone");
     }
 
     return a;
@@ -215,34 +215,44 @@ void readCate(){
     return;
 }
 
-node makeNode(){
-	Customer cus;
-	cout<<"Nhap thong tin khach hang: "<<endl;
-	fflush(stdin);
+// Hàm loại bỏ ký tự không phải chữ cái và số
+string removeSpecialChars(const string &input) {
+    string result;
+    for (char ch : input) {
+        if (isalnum(ch) || ch == ' ' || ch == '.') {  // Giữ lại chữ cái, số và khoảng trắng, dấu chấm
+            result += ch;
+        }
+    }
+    return result;
+}
 
-	cout<<"Nhap ten khach hang: ";
-	//cin.ignore(); // Xóa ký tự '\n' còn lại trong bộ đệm
-	getline(cin,cus.name);cus.name=chuanhoachu(cus.name);
-	fflush(stdin);
+node makeNode() {
+    Customer cus;
+    cout << "Nhap thong tin khach hang: " << endl;
 
-	cout<<"Nhap tuoi khach hang: ";
-	cin>>cus.age;cus.age=chuanhoatuoi(cus.age);
-	cin.ignore(); // Xóa ký tự '\n' còn lại trong bộ đệm
-
-	cout<<"Nhap so dien thoai khach hang: ";
-	cin>>cus.phonenumber;cus.phonenumber=chuanhoasdt(cus.phonenumber);
-	cin.ignore(); // Xóa ký tự '\n' còn lại trong bộ đệm
-	fflush(stdin);
+    cout << "Nhap ten khach hang: ";
+    getline(cin.ignore(), cus.name);
+	cus.name = removeSpecialChars(cus.name);
+    //cus.name = chuanhoachu(cus.name);
 	
+    cout << "Nhap tuoi khach hang: ";
+    cin >> cus.age;
+    cus.age = chuanhoatuoi(cus.age);
+    cin.ignore();  // Xóa ký tự thừa sau khi nhập
 
-	bool found = false;
+    cout << "Nhap so dien thoai khach hang: ";
+    cin >> cus.phonenumber;
+    cus.phonenumber = chuanhoasdt(cus.phonenumber);
+    cin.ignore();  // Xóa ký tự thừa sau khi nhập
+
+    bool found = false;
 
     while (!found)
     {
         cout<<"Nhap mon hang: "; 
-		
         getline(cin,cus.item);
-		cus.item=chuanhoachu(cus.item);
+		cus.item = removeSpecialChars(cus.item);
+		//cus.item=chuanhoachu(cus.item);
 
         ifstream myfile("danhmuc.txt");
         string line;
@@ -266,79 +276,72 @@ node makeNode(){
 
 	found = false;
 	while (!found)
-	{
-		cout << "Nhap dung luong dien thoai: ";
-		cin >> cus.storage;
-	
-		ifstream myfile("danhmuc.txt");
-		if (!myfile.is_open()) {
-			cout << "Khong the mo file danhmuc.txt" << endl;
-			break;
-		}
-	
-		string line;
-		int i = 0;
-	
-		while (getline(myfile, line))
-		{
-			stringstream ss(line);
-			getline(ss, arr[i].namepro, ',');
-			getline(ss, arr[i].storage, ',');
-			getline(ss, arr[i].price, ',');
-			getline(ss, arr[i].warranty);
-	
-			if (arr[i].namepro == cus.item && arr[i].storage == cus.storage)
-			{
-				cus.price = arr[i].price;
-				cus.warranty = arr[i].warranty;
-				found = true;
-				break;
-			}
-			i++;
-		}
-	
-		myfile.close();
-	
-		if (!found)
-		{
-			cout << "Dung luong ban vua nhap khong ton tai\n";
-			cout << "Vui long nhap lai" << endl;
-		}
-	}
+    {
+        cout<<"Nhap dung luong dien thoai: ";
+        cin>>cus.storage;
+		cus.storage = removeSpecialChars(cus.storage);
+        ifstream myfile("danhmuc.txt");
+        string line;
 
-	ifstream myfile("danhmuc.txt");
-	int i = 0;
-    if(myfile.is_open()){
-        while(!myfile.eof()){
-            getline(myfile, arr[i].namepro, ',');
-            getline(myfile, arr[i].storage, ',');
-            getline(myfile, arr[i].price, ',');
-            getline(myfile, arr[i].warranty);
-            i++;
+        while (getline(myfile, line))
+        {
+            if (line.find(cus.storage) != string::npos)
+            {
+                ifstream myfile("danhmuc.txt");
+				int i = 0;
+			    if(myfile.is_open()){
+			        while(!myfile.eof()){
+			            getline(myfile, arr[i].namepro, ',');
+			            getline(myfile, arr[i].storage, ',');
+			            getline(myfile, arr[i].price, ',');
+			            getline(myfile, arr[i].warranty);
+			            i++;
+			        }
+			        myfile.close();
+			    }
+			
+				for (int j = 0; j < i; j++){
+			        if(arr[j].namepro == cus.item && arr[j].storage == cus.storage){
+						cus.price = arr[j].price;
+						cus.warranty = arr[j].warranty;
+						found = true;
+                		break;
+					}	
+			    }
+            }
         }
-        myfile.close();
+
+        if (!found){
+            cout << "Dung luong ban vua nhap khong ton tai\n";
+			cout << "Vui long nhap lai" << endl;
+        }
+
+        file.close();
     }
 
-	for (int j = 0; j < i; j++){
-        if(arr[j].namepro == cus.item && arr[j].storage == cus.storage){
-			cus.price = arr[j].price;
-			cus.warranty = arr[j].warranty;
-		}
-    }
-	
-	cus.price=chuanhoagia(cus.price);
+    // Chuẩn hóa giá cả và ngày giao dịch
+    cus.price = chuanhoagia(cus.price);
+    cus.trade_date = chuanhoaday(cus.trade_date);
 
-	cus.trade_date=chuanhoaday(cus.trade_date);
-	
-	ofstream file("data.txt", ios::app);
-	node tmp = new Node();
-	tmp->cus = cus;
-	tmp->next = NULL;
-	if(file.is_open()){
-        file << cus.name << "," << cus.age << "," << cus.phonenumber << "," << cus.item << "," << cus.storage << "," << cus.price << "," << cus.trade_date << "," << cus.warranty << endl;
+    // Tạo node mới
+    ofstream file("data.txt", ios::app);
+    node tmp = new Node();
+    tmp->cus = cus;
+    tmp->next = NULL;
+
+    if (file.is_open()) {
+        file << cus.name << "," << cus.age << ","
+             << cus.phonenumber << "," << cus.item << ","
+             << cus.storage << "," << cus.price << ","
+             << cus.trade_date << "," << cus.warranty << endl;
+        file.close();
+    } else {
+        cout << "Khong the mo file data.txt" << endl;
     }
-	return tmp;
+
+    return tmp;
 }
+
 
 
 bool empty(node a){
@@ -364,7 +367,15 @@ void insertCustomer(node &a){
 	}
 }
 
-void deleteAllCustomer(node &a);
+void deleteAllCustomer(node &a){
+	a = NULL;
+	ofstream file("data.txt",ios::trunc);
+	if (file.is_open()) {
+    	file << "";
+    	file.close();
+	}
+	cout<<"Da xoa toan bo thong tin khach hang" << endl;
+}
 
 void deleteCustomer(node &a){
 	if(empty(a)){
@@ -414,15 +425,6 @@ void deleteCustomer(node &a){
 	}
 }
 
-void deleteAllCustomer(node &a){
-	a = NULL;
-	ofstream file("data.txt",ios::trunc);
-	if (file.is_open()) {
-    	file << "";
-    	file.close();
-	}
-	cout<<"Da xoa toan bo thong tin khach hang" << endl;
-}
 
 string firstName(string fullName) {
     // tim vi tri khoang trang cuoi cung trong ho va ten
@@ -459,27 +461,27 @@ void sapxep(node head){
 
 void bar(){
 	cout<<"--------------------------------------------------------------------------------------------------------------------------------------------------------------\n";
-	cout<<setiosflags(ios::left)<<setw(30)<<"Ten";
-    cout<<setiosflags(ios::left)<<setw(10)<<"Tuoi";
-    cout<<setiosflags(ios::left)<<setw(20)<<"So dien thoai";
-    cout<<setiosflags(ios::left)<<setw(20)<<"Mon hang";
-	cout<<setiosflags(ios::left)<<setw(20)<<"Dung luong";
-    cout<<setiosflags(ios::left)<<setw(20)<<"Gia mon hang";
-    cout<<setiosflags(ios::left)<<setw(20)<<"Ngay mua hang";
-    cout<<setiosflags(ios::left)<<setw(20)<<"Thoi han bao hanh";
+	cout << left << setw(30) <<"Ten";
+    cout << left << setw(10) <<"Tuoi";
+    cout << left << setw(20) <<"So dien thoai";
+    cout << left << setw(20) <<"Mon hang";
+	cout << left << setw(20) <<"Dung luong";
+    cout << left << setw(20) <<"Gia mon hang";
+    cout << left << setw(20) <<"Ngay mua hang";
+    cout << left << setw(20) <<"Thoi han bao hanh";
     cout<<endl;
 	cout<<"--------------------------------------------------------------------------------------------------------------------------------------------------------------\n";
 }
 
 void printCustomer(Customer cus){
-    cout<<setiosflags(ios::left)<<setw(30)<<cus.name;
-    cout<<setiosflags(ios::left)<<setw(10)<<cus.age;
-    cout<<setiosflags(ios::left)<<setw(20)<<cus.phonenumber;
-    cout<<setiosflags(ios::left)<<setw(20)<<cus.item;
-	cout<<setiosflags(ios::left)<<setw(20)<<cus.storage;
-    cout<<setiosflags(ios::left)<<setw(20)<<cus.price;
-    cout<<setiosflags(ios::left)<<setw(20)<<cus.trade_date;
-    cout<<setiosflags(ios::left)<<setw(20)<<cus.warranty;
+    cout << left << setw(30) << cus.name;
+    cout << left << setw(10) << cus.age;
+    cout << left << setw(20) << cus.phonenumber;
+    cout << left << setw(20) << cus.item;
+    cout << left << setw(20) << cus.storage;
+    cout << left << setw(20) << cus.price;
+    cout << left << setw(20) << cus.trade_date;
+    cout << cus.warranty;
     cout<<endl;
 }
 
@@ -489,7 +491,6 @@ void printInfo(node &a) {
     } else {
         bar();
         node tmp = a;
-		cout << a->cus.name;
         sapxep(a);
         while (tmp != NULL) {
             printCustomer(tmp->cus);
@@ -587,7 +588,7 @@ void changeCustomer(node &a){
 					printCustomer(check);
 					cout<<"Ban co muon thay doi ten khong: ";cin>>selection;
 					if(selection == "co"){
-						fflush(stdin);
+						
 						cout<<"Ten moi: ";getline(cin,check.name);
 						check.name=chuanhoachu(check.name);
 					}
@@ -603,13 +604,13 @@ void changeCustomer(node &a){
 					}
 					cout<<"Ban co muon thay doi mon hang khong: ";cin>>selection;
 					if(selection == "co"){
-						fflush(stdin);
+						
 						cout<<"Mon hang moi: ";getline(cin,check.item);
 						check.item=chuanhoachu(check.item);
 					}
 					cout<<"Ban co muon thay doi dung luong dien thoai khong: ";cin>>selection;
 					if(selection == "co"){
-						fflush(stdin);
+						
 						cout<<"Dung luong moi: ";getline(cin,check.storage);
 					}
 					cout<<"Ban co muon thay doi gia mon hang khong: ";cin>>selection;
@@ -756,7 +757,7 @@ Menu::Menu() {
 
 void Menu::printMenu() {
     for (int i = 0; i < _numberOfItem; i++) {
-        gotoxy(3, 6 + i);
+        gotoxy(3, 7 + i);
         cout << item[i];
         usleep(100000); // Dừng 100ms
     }
@@ -771,118 +772,111 @@ void Menu::deleteMenu() {
 }
 
 int main(){
-node head = NULL;
-file.open("data.txt", ios::out | ios::app);
-head = readCus();
-string mode;
-Menu menu;
-int x;
-int line = 6; //V? tr? d?ng c?a menu
-bool thoat = false;
+	node head = NULL;
+	file.open("data.txt", ios::out | ios::app);
+	head = readCus();
+	string mode;
+	Menu menu;
+	int x;
+	int line = 7; //Vi tri bat dau cua pointer
+	bool thoat = false;
 
 
-cout << "Ngo Huynh Tien Dung - 20119209";
-cout << "\nLy Huu Dang - 20119213";
-cout << "\nNguyen Van Truong Sinh - 20119274";
-cout << "\n\t\t\tGVHD: PGS.TS. Hoang Van Dung";
-cout << "\n=============================================================";
-cout << "\n\t\tDanh sach quan ly khach hang tai cua hang dien thoai chuyen ban iPhone";
-menu.printMenu();
-cout << "\n=============================================================";
+	cout << "\n=============================================================";
+	cout << "\n \t\t--------------------------------------------------------------------------";
+	cout << "\n\t\t| Danh sach quan ly khach hang tai cua hang dien thoai chuyen ban iPhone |";
+	cout << "\n \t\t--------------------------------------------------------------------------\n";
+	menu.printMenu();
+	cout << "\n=============================================================";
 
 
+	gotoxy(0, line);
+	cout << (char) 1; //V? con tr? tr? t?i menu
 
+	while (!thoat) {
+		if (kbhit()) {
+			x = move();
+			gotoxy(0, line);
+			cout << " "; //X?a con tr? ? v? tr? cu
+			switch (x) {
+				case 1:
 
-
-gotoxy(0, line);
-cout << (char) 1; //V? con tr? tr? t?i menu
-
-while (!thoat) {
-	if (kbhit()) {
-		x = move();
-		gotoxy(0, line);
-		cout << " "; //X?a con tr? ? v? tr? cu
-		switch (x) {
-			case 1:
-
-			case 3: {
-					line++;
-					if (line >= menu.numberOfItem()+6) line = 6;
-					break;
-				}
-
-			case 2:
-
-			case 4: {
-					line--;
-					if (line < 6) line = menu.numberOfItem() + 6 - 1;
-					break;
-				}
-
-			case 5:{
-					gotoxy(0, 15);
-					if(menu.getItem()[line-6] == "1. Nhap thong tin khach hang")
-						insertCustomer(head);
-					else if (menu.getItem()[line-6] == "2. Xoa thong tin khach hang")
-						deleteCustomer(head);
-					else if (menu.getItem()[line-6] == "3. Xoa tat ca thong tin khach hang")
-						deleteAllCustomer(head);
-					else if (menu.getItem()[line-6] == "4. Tim kiem thong tin khach hang"){
-						string choice;
-						cout<<"1. Tim kiem theo so dien thoai khach hang\n";
-						cout<<"2. Tim kiem theo san pham\n"; 
-						cout<<"Moi ban chon: "; cin>>choice;
-						if(choice == "1")
-							printOneInfo(head);
-						else if(choice == "2")
-							printInfoByItem(head);
-					}
-					else if (menu.getItem()[line-6] == "5. Thong tin tat ca khach hang")
-						printInfo(head);
-					else if (menu.getItem()[line-6] == "6. Danh muc san pham")
-						readCate();
-					else if (menu.getItem()[line-6] == "7. Thay doi thong tin khach hang")
-						changeCustomer(head);
-					else if (menu.getItem()[line-6] == "8. Het gio lam"){
-						system("clear");
-						cout<<"******* Chuc mot ngay tot lanh *******"<<endl;
-						cout<<"************ Hen gap lai *************"<<endl;
-						file.close();
-						thoat = true;
+				case 3: {
+						line++;
+						if (line >= menu.numberOfItem()+7) line = 7;
 						break;
 					}
-					system("read -p 'Nhan phim bat ky de tiep tuc...' var");
+
+				case 2:
+
+				case 4: {
+						line--;
+						if (line < 7) line = menu.numberOfItem() + 7 - 1;
+						break;
+					}
+
+				case 5:{
+						gotoxy(0, 16);
+						if(menu.getItem()[line-7] == "1. Nhap thong tin khach hang")
+							insertCustomer(head);
+						else if (menu.getItem()[line-7] == "2. Xoa thong tin khach hang")
+							deleteCustomer(head);
+						else if (menu.getItem()[line-7] == "3. Xoa tat ca thong tin khach hang")
+							deleteAllCustomer(head);
+						else if (menu.getItem()[line-7] == "4. Tim kiem thong tin khach hang"){
+							string choice;
+							cout<<"1. Tim kiem theo so dien thoai khach hang\n";
+							cout<<"2. Tim kiem theo san pham\n"; 
+							cout<<"Moi ban chon: "; cin>>choice;
+							if(choice == "1")
+								printOneInfo(head);
+							else if(choice == "2")
+								printInfoByItem(head);
+						}
+						else if (menu.getItem()[line-7] == "5. Thong tin tat ca khach hang")
+							printInfo(head);
+						else if (menu.getItem()[line-7] == "6. Danh muc san pham")
+							readCate();
+						else if (menu.getItem()[line-7] == "7. Thay doi thong tin khach hang")
+							changeCustomer(head);
+						else if (menu.getItem()[line-7] == "8. Het gio lam"){
+							system("clear");
+							cout<<"******* Chuc mot ngay tot lanh *******"<<endl;
+							cout<<"************ Hen gap lai *************"<<endl;
+							file.close();
+							thoat = true;
+							break;
+						}
+						system("read -p 'Nhan phim bat ky de tiep tuc...' var");
+						system("clear");
+						cout << "\n=============================================================";
+						cout << "\n \t\t--------------------------------------------------------------------------";
+						cout << "\n\t\t| Danh sach quan ly khach hang tai cua hang dien thoai chuyen ban iPhone |";
+						cout << "\n \t\t--------------------------------------------------------------------------\n";
+						menu.printMenu();
+						cout << "\n=============================================================";
+						break;
+					}
+
+				case 8:{
 					system("clear");
-					cout << "Ngo Huynh Tien Dung - 20119209";
-					cout << "\nLy Huu Dang - 20119213";
-					cout << "\nNguyen Van Truong Sinh - 20119274";
-					cout << "\n\t\t\tGVHD: PGS.TS. Hoang Van Dung";
-					cout << "\n=============================================================";
-					cout << "\n\t\tDanh sach quan ly khach hang tai cua hang dien thoai chuyen ban iPhone";
-					menu.printMenu();
-					cout << "\n=============================================================";
+					cout<<"******* Chuc mot ngay tot lanh *******"<<endl;
+					cout<<"************ Hen gap lai *************"<<endl;
+					file.close();
+					thoat = true;
 					break;
 				}
-
-			case 8:{
-				system("clear");
-				cout<<"******* Chuc mot ngay tot lanh *******"<<endl;
-				cout<<"************ Hen gap lai *************"<<endl;
-				file.close();
-				thoat = true;
-				break;
+					
 			}
-				
+			gotoxy(0, line);
+			cout << (char) 1;
+
 		}
-		gotoxy(0, line);
-		cout << (char) 1;
+		
 
 	}
 
-}
+	//menu.deleteMenu();
 
-//menu.deleteMenu();
-
-return 0;
-
+	return 0;
 }
