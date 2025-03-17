@@ -86,6 +86,7 @@ string chuanhoasdt(string &a){
 		}	
 		return a;
 	}
+	return a;
 }
 
 string chuanhoaday(string &a){
