@@ -208,7 +208,7 @@ void readCate(){
         cout<<setiosflags(ios::left)<<setw(20)<<arr[j].namepro;
 	    cout<<setiosflags(ios::left)<<setw(15)<<arr[j].storage;
 	    cout<<setiosflags(ios::left)<<setw(20)<<chuanhoagia(arr[j].price);
-	    cout<<setiosflags(ios::left)<<setw(10)<<arr[j].warranty;
+	    cout<<arr[j].warranty;
 	    cout<<endl;
     }
 
@@ -378,53 +378,66 @@ void deleteAllCustomer(node &a){
 	cout<<"Da xoa toan bo thong tin khach hang" << endl;
 }
 
-void deleteCustomer(node &a){
-	if(empty(a)){
-		cout<<"Khong co khach hang."<<endl;
-	}else{
-		Customer check;
-		string sdt,choice;
-		cout<<"Nhap so dien thoai khach hang: ";cin>>sdt;
-		node top = NULL;
-		int count=0;
-		for(int i=1;i<=size(a);i++){
-			++count;
-			check = a->cus;
-			if(sdt == check.phonenumber){
-				if(count == size(a)){
-					top->next = NULL;
-				}else if(count == 1){
-					a= a->next;
-				}else{
-					top->next = a->next;
-					a->next = NULL;
-				}
-				ofstream file("data.txt", ios::out);
-			    if(file.is_open()){
-			    	while(a){
-			      	   	file << a->cus.name << "," << a->cus.age << "," 
-						<< a->cus.phonenumber << "," << a->cus.item << "," 
-						<< a->cus.storage << "," << a->cus.price << "," 
-						<< a->cus.trade_date << "," << a->cus.warranty << endl;
-			            a = a->next;
-			        }
-			    	file.close();
-			    }
-			}else{
-				top = a;
-				a = a->next;
-				if(count == size(a) && sdt!=check.phonenumber){
-					cout<<"So dien thoai khong hop le."<<endl;
-					cout<<"Ban co muon thu lai khong: ";cin>>choice;
-					if(choice =="co"||choice =="yes"||choice =="ok"){
-						deleteCustomer(a);
-					}else
-						return;
-				}
-			}
-		}
-	}
+void deleteCustomer(node &a) {
+    if (empty(a)) {
+        cout << "Khong co khach hang." << endl;
+        return;
+    }
+
+    Customer check;
+    string sdt, choice;
+    cout << "Nhap so dien thoai khach hang: ";
+    cin >> sdt;
+
+    node current = a;
+    node previous = NULL;
+    bool found = false;
+
+    while (current != NULL) {
+        check = current->cus;
+        if (sdt == check.phonenumber) {
+            found = true;
+
+            // Nếu là nút đầu tiên
+            if (previous == NULL) {
+                a = current->next;
+            } else {
+                previous->next = current->next;
+            }
+
+            delete current;  // Giải phóng bộ nhớ
+            cout << "Xoa khach hang thanh cong." << endl;
+
+            // Cập nhật lại file sau khi xóa
+            ofstream file("data.txt", ios::out);
+            if (file.is_open()) {
+                node temp = a;
+                while (temp != NULL) {
+                    file << temp->cus.name << "," << temp->cus.age << ","
+                         << temp->cus.phonenumber << "," << temp->cus.item << ","
+                         << temp->cus.storage << "," << temp->cus.price << ","
+                         << temp->cus.trade_date << "," << temp->cus.warranty << endl;
+                    temp = temp->next;
+                }
+                file.close();
+            }
+            return;
+        }
+        // Cập nhật con trỏ trước và hiện tại
+        previous = current;
+        current = current->next;
+    }
+
+    if (!found) {
+        cout << "So dien thoai khong hop le." << endl;
+        cout << "Ban co muon thu lai khong (co/yes/ok)? ";
+        cin >> choice;
+        if (choice == "co" || choice == "yes" || choice == "ok") {
+            deleteCustomer(a);
+        }
+    }
 }
+
 
 
 string firstName(string fullName) {
@@ -571,89 +584,131 @@ void printOneInfo(node &a){
 	}
 }
 
-void changeCustomer(node &a){
-	if(empty(a)){
-		cout<<"Khong co khach hang."<<endl;
-	}else{
-		Customer check;
-		string sdt,choice;
-		string selection;
-		string day,month,year;
-		bool found = false;
-		cout<<"Nhap so dien thoai khach hang: ";cin>>sdt;
-		while(!found){
-			for(node i = a; i != NULL; i = i->next){ 
-				check = i->cus;
-				if(sdt == check.phonenumber){
-					bar();
-					printCustomer(check);
-					cout<<"Ban co muon thay doi ten khong: ";cin>>selection;
-					if(selection == "co"){
-						
-						cout<<"Ten moi: ";getline(cin,check.name);
-						check.name=chuanhoachu(check.name);
-					}
-					cout<<"Ban co muon thay doi tuoi khong: ";cin>>selection;
-					if(selection == "co"){
-						cout<<"Tuoi moi: ";cin>>check.age;
-						check.age=check.age+" tuoi";
-					}
-					cout<<"Ban co muon thay doi so dien thoai khong: ";cin>>selection;
-					if(selection == "co"){
-						cout<<"So dien thoai moi: ";cin>>check.phonenumber;
-						check.phonenumber=chuanhoasdt(check.phonenumber);
-					}
-					cout<<"Ban co muon thay doi mon hang khong: ";cin>>selection;
-					if(selection == "co"){
-						
-						cout<<"Mon hang moi: ";getline(cin,check.item);
-						check.item=chuanhoachu(check.item);
-					}
-					cout<<"Ban co muon thay doi dung luong dien thoai khong: ";cin>>selection;
-					if(selection == "co"){
-						
-						cout<<"Dung luong moi: ";getline(cin,check.storage);
-					}
-					cout<<"Ban co muon thay doi gia mon hang khong: ";cin>>selection;
-						if(selection == "co"){
-						cout<<"Gia moi: ";cin>>check.price;
-						check.price=chuanhoagia(check.price);
-					}
-					cout<<"Ban co muon thay doi thoi gian bao hanh khong: ";cin>>selection;
-					if(selection == "co"){
-						cout<<"Thoi gian bao hanh moi: ";cin>>check.warranty;
-						check.warranty=check.warranty+" nam";
-					}
-					i->cus = check;
-					ofstream file("data.txt", ios::out);
-					if(file.is_open()){
-						i = a;
-						while(i){
-							file << i->cus.name << "," << i->cus.age << "," 
-							<< i->cus.phonenumber << "," << i->cus.item << ","
-							<< i->cus.price << "," << i->cus.trade_date << ","
-							<< i->cus.warranty << endl;
-							i = i->next;
-						}
-						file.close();
-					}
-					found = true;
-					break;
-			    }
-			}
+void changeCustomer(node &a) {
+    if (empty(a)) {
+        cout << "Khong co khach hang." << endl;
+        return;
+    }
 
-			if(!found){
-				cout<<"So dien thoai khong hop le."<<endl;
-				cout<<"Ban co muon thu lai khong: ";cin>>choice;
-				if(choice =="co"||choice =="yes"||choice =="ok"){
-					cout<<"Nhap so dien thoai khach hang: ";cin>>sdt;
-				}else{
-					found = true;
-					break;
-				}
-			}	
-		}
-	}
+    Customer check;
+    string sdt, choice, selection;
+    bool found = false;
+
+    cout << "Nhap so dien thoai khach hang: ";
+    cin >> sdt;
+
+    while (!found) {
+        for (node i = a; i != NULL; i = i->next) {
+            check = i->cus;
+            if (sdt == check.phonenumber) {
+                bar();
+                printCustomer(check);
+
+                cin.ignore(); // Xóa ký tự '\n' còn lại sau khi nhập số điện thoại
+
+                // Thay đổi tên
+                cout << "Ban co muon thay doi ten khong (co/khong)? ";
+                cin >> selection;
+                cin.ignore(); // Xóa ký tự '\n' sau khi nhập
+                if (selection == "co") {
+                    cout << "Ten moi: ";
+                    getline(cin, check.name);
+                    check.name = chuanhoachu(check.name);
+                }
+
+                // Thay đổi tuổi
+                cout << "Ban co muon thay doi tuoi khong (co/khong)? ";
+                cin >> selection;
+                if (selection == "co") {
+                    cout << "Tuoi moi: ";
+                    cin >> check.age;
+                    check.age = chuanhoatuoi(check.age); // Chuẩn hóa tuổi
+                }
+
+                // Thay đổi số điện thoại
+                cout << "Ban co muon thay doi so dien thoai khong (co/khong)? ";
+                cin >> selection;
+                if (selection == "co") {
+                    cout << "So dien thoai moi: ";
+                    cin >> check.phonenumber;
+                    check.phonenumber = chuanhoasdt(check.phonenumber);
+                }
+
+                // Thay đổi mặt hàng
+                cin.ignore(); // Xóa ký tự '\n' sau khi nhập
+                cout << "Ban co muon thay doi mon hang khong (co/khong)? ";
+                cin >> selection;
+                cin.ignore(); // Xóa ký tự '\n' sau khi nhập
+                if (selection == "co") {
+                    cout << "Mon hang moi: ";
+                    getline(cin, check.item);
+                    check.item = chuanhoachu(check.item);
+                }
+
+                // Thay đổi dung lượng
+                cout << "Ban co muon thay doi dung luong khong (co/khong)? ";
+                cin >> selection;
+                if (selection == "co") {
+                    cout << "Dung luong moi: ";
+                    cin >> check.storage;
+                    check.storage = chuanhoagia(check.storage);
+                }
+
+                // Thay đổi giá
+                cout << "Ban co muon thay doi gia khong (co/khong)? ";
+                cin >> selection;
+                if (selection == "co") {
+                    cout << "Gia moi: ";
+                    cin >> check.price;
+                    check.price = chuanhoagia(check.price);
+                }
+
+                // Thay đổi thời gian bảo hành
+                cout << "Ban co muon thay doi thoi gian bao hanh khong (co/khong)? ";
+                cin >> selection;
+                if (selection == "co") {
+                    cout << "Thoi gian bao hanh moi: ";
+                    cin >> check.warranty;
+                    check.warranty = check.warranty + " nam";
+                }
+
+                // Cập nhật lại dữ liệu của khách hàng
+                i->cus = check;
+
+                // Ghi lại toàn bộ danh sách vào file
+                ofstream file("data.txt", ios::out);
+                if (file.is_open()) {
+                    node temp = a;
+                    while (temp) {
+                        file << temp->cus.name << "," << temp->cus.age << ","
+                             << temp->cus.phonenumber << "," << temp->cus.item << ","
+                             << temp->cus.storage << "," << temp->cus.price << ","
+                             << temp->cus.trade_date << "," << temp->cus.warranty << endl;
+                        temp = temp->next;
+                    }
+                    file.close();
+                    cout << "Cap nhat thong tin khach hang thanh cong." << endl;
+                } else {
+                    cout << "Khong the mo file data.txt" << endl;
+                }
+
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            cout << "So dien thoai khong hop le." << endl;
+            cout << "Ban co muon thu lai khong (co/khong)? ";
+            cin >> choice;
+            if (choice == "co" || choice == "yes" || choice == "ok") {
+                cout << "Nhap so dien thoai khach hang: ";
+                cin >> sdt;
+            } else {
+                break;
+            }
+        }
+    }
 }
 
 
@@ -719,10 +774,9 @@ int move() {
                 case 'D': return 4; // Trái
             }
         }
+		return 8;
     } else if (c == 10) {
         return 5; // Enter
-    } else if (c == 27) {
-        return 8; // ESC
     }
     return 0;
 }
