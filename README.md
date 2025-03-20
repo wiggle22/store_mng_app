@@ -1,4 +1,4 @@
-# store_mng_app
+# IP_mng_app
 Application of Phone Store management
 
 # MakeFile Usage
