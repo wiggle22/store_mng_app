@@ -8,7 +8,7 @@ all:
 	./IP_mng_app
 
 debug:
-	g++ -o -g IP_mng_app main.cpp
+	g++ -g -o IP_mng_app main.cpp
 	gdb ./IP_mng_app
 
 clean:
