@@ -33,7 +33,8 @@ class Menu {
         static const int _numberOfItems = 8;
         string items[_numberOfItems];
 };
-    
+ 
+/* Class menuu */
 Menu::Menu() {
     items[0] = "1. Enter customer information";
     items[1] = "2. Delete customer information";
@@ -56,7 +57,8 @@ node readCustomers() {
 
     string line;
     while (getline(file, line)) {
-        if (line.empty()) continue; // Skip empty lines
+        // Skip empty lines
+        if (line.empty()) continue; 
 
         Customer cus;
         stringstream ss(line);
