@@ -22,7 +22,7 @@ node readCustomers() {
     node head = NULL;
     ifstream file("customerdata.txt");
     if (!file.is_open()) {
-        cout << "Unable to open file customerdata.txt" << endl;
+        cout << "[ERROR] Unable to open file customerdata.txt" << endl;
         return head;
     }
 
@@ -55,7 +55,7 @@ void readCategory() {
     int i = 0;
 
     if (!myfile.is_open()) {
-        cout << "Unable to open file category.txt" << endl;
+        cout << "[ERROR] Unable to open file category.txt" << endl;
         return;
     }
 
@@ -101,22 +101,22 @@ string removeSpecialChars(const string &input) {
 
 node makeNode() {
     Customer cus;
-    cout << "Enter customer information: " << endl;
+    cout << "* Enter customer information *" << endl;
 
     // Input and format customer name
-    cout << "Enter customer name: ";
+    cout << "=> Customer name: ";
     getline(cin.ignore(), cus.name);
     cus.name = removeSpecialChars(cus.name);
     cus.name = formatName(cus.name);
 
     // Input and format customer age
-    cout << "Enter customer age: ";
+    cout << "=> Customer age: ";
     cin >> cus.age;
     cus.age = formatAge(cus.age);
     cin.ignore();  // Clear extra character after input
 
     // Input and format customer phone number
-    cout << "Enter customer phone number: ";
+    cout << "=> Customer phone number: ";
     cin >> cus.phonenumber;
     cus.phonenumber = formatPhoneNumber(cus.phonenumber);
     cin.ignore();  // Clear extra character after input
@@ -124,7 +124,7 @@ node makeNode() {
     // Input and validate product item
     bool found = false;
     while (!found) {
-        cout << "Enter product item: ";
+        cout << "=> Product item: ";
         getline(cin, cus.item);
         cus.item = removeSpecialChars(cus.item);
         cus.item = formatName(cus.item);
@@ -141,7 +141,7 @@ node makeNode() {
         myfile.close();
 
         if (!found) {
-            cout << "The product you entered is not in the catalog.\n";
+            cout << "[WARNING] The product you entered is not in the catalog.\n";
             cout << "Please try again." << endl;
         }
     }
@@ -149,7 +149,7 @@ node makeNode() {
     // Input and validate phone storage capacity
     found = false;
     while (!found) {
-        cout << "Enter phone storage capacity: ";
+        cout << "=> Phone storage capacity: ";
         cin >> cus.storage;
         cus.storage = removeSpecialChars(cus.storage);
 
@@ -178,7 +178,7 @@ node makeNode() {
         }
 
         if (!found) {
-            cout << "The storage capacity you entered does not exist.\n";
+            cout << "[WARNING] The storage capacity you entered does not exist.\n";
             cout << "Please try again." << endl;
         }
     }
@@ -200,7 +200,7 @@ node makeNode() {
              << cus.trade_date << "," << cus.warranty << endl;
         file.close();
     } else {
-        cout << "Unable to open file customerdata.txt" << endl;
+        cout << "[ERROR] Unable to open file customerdata.txt" << endl;
     }
 
     return tmp;
@@ -217,7 +217,7 @@ string getFirstName(const string& fullName) {
 
 void sortList(node head) {
     if (head == NULL) {
-        cout << "The list is empty!" << endl;
+        cout << "[WARNING] The list is empty!" << endl;
         return;
     }
 
@@ -247,7 +247,7 @@ void sortList(node head) {
         }
         file.close();
     } else {
-        cout << "Unable to open file for writing!" << endl;
+        cout << "[ERROR] Unable to open file for writing!" << endl;
     }
 }
 
@@ -277,13 +277,13 @@ void deleteAllCustomers(node &a) {
 
 void deleteCustomer(node &a) {
     if (isEmpty(a)) {
-        cout << "No customer found." << endl;
+        cout << "[WARNING] No customer found." << endl;
         return;
     }
 
     Customer check;
     string phoneNumber, choice;
-    cout << "Enter customer phone number: ";
+    cout << "=> Customer phone number: ";
     cin >> phoneNumber;
 
     node current = a;
@@ -328,13 +328,13 @@ void deleteCustomer(node &a) {
     }
 
     if (!found) {
-        cout << "Phone number not found." << endl;
-        cout << "Would you like to try again (yes/ok)? ";
+        cout << "[WARNING] Phone number not found." << endl;
+        cout << "Would you like to try again (yes/no)? ";
         cin >> choice;
 
         // Convert to lowercase for comparison
         transform(choice.begin(), choice.end(), choice.begin(), ::tolower);
-        if (choice == "yes" || choice == "ok") {
+        if (choice == "yes" || choice == "no") {
             deleteCustomer(a);
         }
     }
@@ -368,7 +368,7 @@ void printCustomer(Customer cus) {
 
 void printInfo(node &a) {
     if (isEmpty(a)) {
-        cout << "No customer found." << endl;
+        cout << "[WARNING] No customer found." << endl;
         return;
     }
 
@@ -397,7 +397,7 @@ bool checkItem(const string& choice, const string& item) {
 
 void printInfoByItem(node &a) {
     if (isEmpty(a)) {
-        cout << "No customer found." << endl;
+        cout << "[WARNING] No customer found." << endl;
         return;
     }
 
@@ -420,20 +420,20 @@ void printInfoByItem(node &a) {
     }
 
     if (!found) {
-        cout << "No customer found with the corresponding product." << endl;
+        cout << "[WARNING] No customer found with the corresponding product." << endl;
     }
 }
 
 void printOneInfo(node &a) {
     if (isEmpty(a)) {
-        cout << "No customer found." << endl;
+        cout << "[WARNING] No customer found." << endl;
         return;
     }
 
     string phoneNumber, choice;
     bool found = false;
 
-    cout << "Enter customer phone number: ";
+    cout << "=> Customer phone number: ";
     cin >> phoneNumber;
 
     while (!found) {
@@ -447,11 +447,11 @@ void printOneInfo(node &a) {
         }
 
         if (!found) {
-            cout << "Invalid phone number." << endl;
-            cout << "Would you like to try again (yes/ok)? ";
+            cout << "[WARNING] Invalid phone number." << endl;
+            cout << "Would you like to try again (yes/no)? ";
             cin >> choice;
-            if (choice == "yes" || choice == "ok") {
-                cout << "Enter customer phone number: ";
+            if (choice == "yes" || choice == "no") {
+                cout << "=> Customer phone number: ";
                 cin >> phoneNumber;
             } else {
                 break;
@@ -474,7 +474,7 @@ void updateFile(node &a) {
         file.close();
         cout << "Customer information updated successfully." << endl;
     } else {
-        cout << "Unable to open customerdata.txt" << endl;
+        cout << "[ERROR] Unable to open customerdata.txt" << endl;
     }
 }
 
@@ -483,12 +483,12 @@ bool askYesNo(const string &message) {
     cout << message << " (yes/no)? ";
     cin >> selection;
     transform(selection.begin(), selection.end(), selection.begin(), ::tolower);
-    return (selection == "yes" || selection == "ok");
+    return (selection == "yes" || selection == "no");
 }
 
 void changeCustomer(node &a) {
     if (isEmpty(a)) {
-        cout << "No customer found." << endl;
+        cout << "[WARNING] No customer found." << endl;
         return;
     }
 
@@ -496,7 +496,7 @@ void changeCustomer(node &a) {
     string phoneNumber;
     bool found = false;
 
-    cout << "Enter customer phone number: ";
+    cout << "=> Customer phone number: ";
     cin >> phoneNumber;
 
     while (!found) {
@@ -561,9 +561,9 @@ void changeCustomer(node &a) {
         }
 
         if (!found) {
-            cout << "Invalid phone number." << endl;
+            cout << "[WARNING] Invalid phone number." << endl;
             if (askYesNo("Would you like to try again")) {
-                cout << "Enter customer phone number: ";
+                cout << "=> Customer phone number: ";
                 cin >> phoneNumber;
             } else {
                 break;
@@ -688,9 +688,9 @@ void Menu::clearMenu() {
 // Function to display the banner title
 void printBanner() {
     cout << "\n=============================================================";
-    cout << "\n \t\t----------------------------------------------";
+    cout << "\n \t\t-----------------------------------------------";
     cout << "\n\t\t| Customer Management System for iPhone Store |";
-    cout << "\n \t\t----------------------------------------------";
+    cout << "\n \t\t-----------------------------------------------";
 }
 
 // Function to exit the program
