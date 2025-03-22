@@ -12,13 +12,10 @@
 #include <algorithm>
 #include <set>
 
-
 using namespace std;
 ofstream file;
 ofstream myfile;
 const int MAX_SIZE = 100;
-
-
 
 struct Customer {
 	string name, age, phonenumber, item, price, storage, trade_date, warranty;
@@ -29,10 +26,23 @@ struct Category {
 };
 
 Category arr[MAX_SIZE];
+int countsdt = 0;
 
 struct Node{
 	Customer cus;
 	Node *next;
+};
+
+// Define enum for menu options
+enum MenuOption {
+    ENTER_INFORMATION = 1,
+    DELETE_INFORMATION,
+    DELETE_ALL,
+    SEARCH_INFORMATION,
+    DISPLAY_ALL_INFORMATION,
+    PRODUCT_CATALOG,
+    UPDATE_INFORMATION,
+    EXIT
 };
 
 typedef struct Node* node;
@@ -65,9 +75,6 @@ string formatName(string &a) {
     return a;
 }
 
-
-int countsdt = 0;
-
 bool isValidPhoneNumber(const string &a) {
     // Valid prefixes of Vietnamese telecom operators
     set<string> validPrefixes = {
@@ -80,7 +87,6 @@ bool isValidPhoneNumber(const string &a) {
 
     return true;
 }
-
 
 string formatPhoneNumber(string &a) {
     string phoneNumber;
@@ -104,7 +110,6 @@ string formatPhoneNumber(string &a) {
     }
 }
 
-
 string formatDate(string &a) {
     time_t now = time(nullptr);
     tm *local_time = localtime(&now);
@@ -118,7 +123,6 @@ string formatDate(string &a) {
     a = ss.str();
     return a;
 }
-
 
 string formatAge(string &a) {
     int age;
@@ -140,9 +144,6 @@ string formatAge(string &a) {
     a = to_string(age) + " years old";
     return a;
 }
-
-
-
 
 string formatPrice(string a) {
     // Remove non-digit and non-dot characters
@@ -172,7 +173,6 @@ string formatPrice(string a) {
     return formattedPrice + " VND";
 }
 
-
 node readCustomers() {
     node head = NULL;
     ifstream file("customerdata.txt");
@@ -201,12 +201,9 @@ node readCustomers() {
         tmp->next = head;
         head = tmp;
     }
-
     file.close();
     return head;
 }
-
-
 
 void readCategory() {
     ifstream myfile("category.txt");
@@ -245,7 +242,6 @@ void readCategory() {
         cout << arr[j].warranty << endl;
     }
 }
-
 
 // Function to remove non-alphanumeric characters
 string removeSpecialChars(const string &input) {
@@ -297,7 +293,6 @@ node makeNode() {
                 break;
             }
         }
-
         myfile.close();
 
         if (!found) {
@@ -366,9 +361,6 @@ node makeNode() {
     return tmp;
 }
 
-
-
-
 bool isEmpty(node a) {
     return a == NULL;
 }
@@ -414,7 +406,6 @@ void sortList(node head) {
     }
 }
 
-
 void insertCustomer(node &a) {
     node tmp = makeNode();
     tmp->next = a;
@@ -438,8 +429,6 @@ void deleteAllCustomers(node &a) {
 
     cout << "All customer information has been deleted" << endl;
 }
-
-
 
 void deleteCustomer(node &a) {
     if (isEmpty(a)) {
@@ -506,8 +495,6 @@ void deleteCustomer(node &a) {
     }
 }
 
-
-
 void printHeader() {
     cout << "--------------------------------------------------------------------------------------------------------------------------------------------------------------\n";
     cout << left << setw(30) << "Name";
@@ -534,7 +521,6 @@ void printCustomer(Customer cus) {
     cout << endl;
 }
 
-
 void printInfo(node &a) {
     if (isEmpty(a)) {
         cout << "No customer found." << endl;
@@ -549,7 +535,6 @@ void printInfo(node &a) {
         tmp = tmp->next;
     }
 }
-
 
 bool checkItem(const string& choice, const string& item) {
     if (choice == "1") 
@@ -594,7 +579,6 @@ void printInfoByItem(node &a) {
     }
 }
 
-
 void printOneInfo(node &a) {
     if (isEmpty(a)) {
         cout << "No customer found." << endl;
@@ -630,7 +614,6 @@ void printOneInfo(node &a) {
         }
     }
 }
-
 
 void updateFile(node &a) {
     ofstream file("customerdata.txt", ios::out);
@@ -744,8 +727,6 @@ void changeCustomer(node &a) {
     }
 }
 
-
-
 // MENU
 void gotoxy(int column, int line) {
     printf("\033[%d;%dH", line, column);
@@ -815,7 +796,6 @@ int move() {
     return 0;
 }
 
-
 // Menu
 class Menu {
     public:
@@ -860,21 +840,6 @@ void Menu::clearMenu() {
     }
 }
     
-
-
-// Define enum for menu options
-enum MenuOption {
-    ENTER_INFORMATION = 1,
-    DELETE_INFORMATION,
-    DELETE_ALL,
-    SEARCH_INFORMATION,
-    DISPLAY_ALL_INFORMATION,
-    PRODUCT_CATALOG,
-    UPDATE_INFORMATION,
-    EXIT
-};
-
-
 // Function to display the banner title
 void printBanner() {
     cout << "\n=============================================================";
