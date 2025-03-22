@@ -18,6 +18,34 @@ ofstream file;
 ofstream myfile;
 Category arr[MAX_SIZE];
 
+// Menu
+class Menu {
+    public:
+        Menu();
+        ~Menu() {}
+    
+        void printMenu();
+        void clearMenu();
+        int getNumberOfItems() const { return _numberOfItems; }
+        const string* getItems() const { return items; }
+    
+    private:
+        static const int _numberOfItems = 8;
+        string items[_numberOfItems];
+};
+    
+Menu::Menu() {
+    items[0] = "1. Enter customer information";
+    items[1] = "2. Delete customer information";
+    items[2] = "3. Delete all customer information";
+    items[3] = "4. Search customer information";
+    items[4] = "5. Display all customer information";
+    items[5] = "6. Product catalog";
+    items[6] = "7. Update customer information";
+    items[7] = "8. Exit";
+}
+
+/* Funtion to show customer list */
 node readCustomers() {
     node head = NULL;
     ifstream file("customerdata.txt");
@@ -50,6 +78,7 @@ node readCustomers() {
     return head;
 }
 
+/* Function to show phone category */
 void readCategory() {
     ifstream myfile("category.txt");
     int i = 0;
@@ -88,7 +117,7 @@ void readCategory() {
     }
 }
 
-// Function to remove non-alphanumeric characters
+/* Function to remove non-alphanumeric characters */
 string removeSpecialChars(const string &input) {
     string result;
     for (char ch : input) {
@@ -99,6 +128,7 @@ string removeSpecialChars(const string &input) {
     return result;
 }
 
+/* Function to add info new customer */
 node makeNode() {
     Customer cus;
     cout << "* Enter customer information *" << endl;
@@ -206,21 +236,23 @@ node makeNode() {
     return tmp;
 }
 
+/* Check emty */
 bool isEmpty(node a) {
     return a == NULL;
 }
 
+/* Function to get first name */
 string getFirstName(const string& fullName) {
     int lastSpacePos = fullName.rfind(" ");
     return lastSpacePos == string::npos ? fullName : fullName.substr(lastSpacePos + 1);
 }
 
+/* Function to sort list */
 void sortList(node head) {
     if (head == NULL) {
         cout << "[WARNING] The list is empty!" << endl;
         return;
     }
-
     // Sort the list by first name
     for (node i = head; i != NULL; i = i->next) {
         node minNode = i;
@@ -229,13 +261,11 @@ void sortList(node head) {
                 minNode = j;
             }
         }
-
         // Swap customer information
         if (minNode != i) {
             swap(minNode->cus, i->cus);
         }
     }
-
     // Write the sorted list to the file
     ofstream file("customerdata.txt", ios::trunc);  // Open file with truncate mode
     if (file.is_open()) {
@@ -251,6 +281,7 @@ void sortList(node head) {
     }
 }
 
+/* Function to add customer */
 void insertCustomer(node &a) {
     node tmp = makeNode();
     tmp->next = a;
@@ -258,6 +289,7 @@ void insertCustomer(node &a) {
     sortList(a);  // Sort the list after insertion
 }
 
+/* Function to delete info of all customer */
 void deleteAllCustomers(node &a) {
     // Free the entire linked list
     while (a != NULL) {
@@ -265,16 +297,15 @@ void deleteAllCustomers(node &a) {
         a = a->next;
         delete tmp;
     }
-
     // Clear the contents of the file
     ofstream file("customerdata.txt", ios::trunc);
     if (file.is_open()) {
         file.close();
     }
-
     cout << "All customer information has been deleted" << endl;
 }
 
+/* Function to delete specified customer */
 void deleteCustomer(node &a) {
     if (isEmpty(a)) {
         cout << "[WARNING] No customer found." << endl;
@@ -340,6 +371,7 @@ void deleteCustomer(node &a) {
     }
 }
 
+/* Function to print header */
 void printHeader() {
     cout << "--------------------------------------------------------------------------------------------------------------------------------------------------------------\n";
     cout << left << setw(30) << "Name";
@@ -354,6 +386,7 @@ void printHeader() {
     cout << "--------------------------------------------------------------------------------------------------------------------------------------------------------------\n";
 }
 
+/* Function to print customer */
 void printCustomer(Customer cus) {
     cout << left << setw(30) << cus.name;
     cout << left << setw(20) << cus.age;
@@ -366,6 +399,7 @@ void printCustomer(Customer cus) {
     cout << endl;
 }
 
+/* Function to print info of customer */
 void printInfo(node &a) {
     if (isEmpty(a)) {
         cout << "[WARNING] No customer found." << endl;
@@ -381,6 +415,7 @@ void printInfo(node &a) {
     }
 }
 
+/* Function to check item */
 bool checkItem(const string& choice, const string& item) {
     if (choice == "1") 
         return (item == "iPhone X" || item == "iPhone Xs" || item == "iPhone Xs Max");
@@ -395,6 +430,7 @@ bool checkItem(const string& choice, const string& item) {
     return false;
 }
 
+/* Function to print info of item */
 void printInfoByItem(node &a) {
     if (isEmpty(a)) {
         cout << "[WARNING] No customer found." << endl;
@@ -424,6 +460,7 @@ void printInfoByItem(node &a) {
     }
 }
 
+/* Function to print info of specified customer */
 void printOneInfo(node &a) {
     if (isEmpty(a)) {
         cout << "[WARNING] No customer found." << endl;
@@ -460,6 +497,7 @@ void printOneInfo(node &a) {
     }
 }
 
+/* Function to update file customer */
 void updateFile(node &a) {
     ofstream file("customerdata.txt", ios::out);
     if (file.is_open()) {
@@ -478,6 +516,7 @@ void updateFile(node &a) {
     }
 }
 
+/* Function to check option */
 bool askYesNo(const string &message) {
     string selection;
     cout << message << " (yes/no)? ";
@@ -486,6 +525,7 @@ bool askYesNo(const string &message) {
     return (selection == "yes" || selection == "no");
 }
 
+/* Function to change info of customer */
 void changeCustomer(node &a) {
     if (isEmpty(a)) {
         cout << "[WARNING] No customer found." << endl;
@@ -572,13 +612,13 @@ void changeCustomer(node &a) {
     }
 }
 
-// MENU
+/* MENU */
 void gotoxy(int column, int line) {
     printf("\033[%d;%dH", line, column);
     fflush(stdout);
 }
 
-// kbhit() in Linux
+/* kbhit() in Linux */
 int kbhit() {
     struct termios oldt, newt;
     int ch;
@@ -604,7 +644,7 @@ int kbhit() {
     return 0;
 }
 
-// getch() in Linux
+/* getch() in Linux */
 char getch() {
     char buf = 0;
     struct termios old = {0};
@@ -622,6 +662,7 @@ char getch() {
     return buf;
 }
 
+/* Function to move pointer */
 int move() {
     char c = getch();
     if (c == 27) { // ESC key
@@ -641,33 +682,7 @@ int move() {
     return 0;
 }
 
-// Menu
-class Menu {
-    public:
-        Menu();
-        ~Menu() {}
-    
-        void printMenu();
-        void clearMenu();
-        int getNumberOfItems() const { return _numberOfItems; }
-        const string* getItems() const { return items; }
-    
-    private:
-        static const int _numberOfItems = 8;
-        string items[_numberOfItems];
-};
-    
-Menu::Menu() {
-    items[0] = "1. Enter customer information";
-    items[1] = "2. Delete customer information";
-    items[2] = "3. Delete all customer information";
-    items[3] = "4. Search customer information";
-    items[4] = "5. Display all customer information";
-    items[5] = "6. Product catalog";
-    items[6] = "7. Update customer information";
-    items[7] = "8. Exit";
-}
-    
+/* Print Menu */
 void Menu::printMenu() {
     for (int i = 0; i < _numberOfItems; i++) {
         gotoxy(3, 7 + i);
@@ -676,7 +691,8 @@ void Menu::printMenu() {
     }
     cout << "\n=============================================================";
 }
-    
+ 
+/* Clear Menu */
 void Menu::clearMenu() {
     for (int i = 0; i < _numberOfItems; i++) {
         gotoxy(0, 7 + i);
@@ -685,7 +701,7 @@ void Menu::clearMenu() {
     }
 }
     
-// Function to display the banner title
+/* Function to display the banner title */
 void printBanner() {
     cout << "\n=============================================================";
     cout << "\n \t\t-----------------------------------------------";
@@ -693,7 +709,7 @@ void printBanner() {
     cout << "\n \t\t-----------------------------------------------";
 }
 
-// Function to exit the program
+/* Function to exit the program */
 void exitProgram() {
     system("clear");
     cout << "******* Have a great day *******" << endl;
@@ -702,7 +718,7 @@ void exitProgram() {
     exit(0);
 }
 
-// Function to handle menu options
+/* Function to handle menu options */
 void handleMenuOption(MenuOption option, node &head) {
     gotoxy(0, 16);
     switch (option) {
@@ -742,7 +758,7 @@ void handleMenuOption(MenuOption option, node &head) {
     }
 }
 
-// Main function
+/* Main function */
 int main() {
     node head = NULL;
     file.open("customerdata.txt", ios::out | ios::app);
