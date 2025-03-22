@@ -3,12 +3,12 @@
 ##				 - use command "make debug" to compile and execute with GDB  		##
 
 all:
-	g++ -o IP_mng_app main.cpp
+	g++ -o IP_mng_app mng_app.cpp format.cpp mng_app.h
 	clear
 	./IP_mng_app
 
 debug:
-	g++ -g -o IP_mng_app main.cpp
+	g++ -g -o IP_mng_app mng_app.cpp
 	gdb ./IP_mng_app
 
 clean:
