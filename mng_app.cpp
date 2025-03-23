@@ -842,7 +842,7 @@ void exitProgram() {
 
 /* Function to handle menu options */
 void handleMenuOption(MenuOption option, node &head) {
-    gotoxy(0, 16);
+    gotoxy(0, 17);
     switch (option) {
         case ENTER_INFORMATION:
             cout << "1. Enter custormer information\n";
