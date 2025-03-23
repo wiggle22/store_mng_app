@@ -133,8 +133,6 @@ string removeSpecialChars(const string &input) {
 /* Function to add info new customer */
 node makeNode() {
     Customer cus;
-    cout << "* Enter customer information *" << endl;
-
     // Input and format customer name
     cout << "=> Customer name: ";
     getline(cin.ignore(), cus.name);
@@ -758,7 +756,7 @@ void handleMenuOption(MenuOption option, node &head) {
             readCategory();
             break;
         case UPDATE_INFORMATION:
-            cout << "7. Update customer information\n";
+            cout << "7. Update customer information\n"; 
             changeCustomer(head);
             break;
         case EXIT:
