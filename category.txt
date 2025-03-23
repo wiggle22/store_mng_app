@@ -11,7 +11,7 @@ iPhone 11 Pro,256GB,9650000 VND,1 year
 iPhone 11 Pro Max,64GB,9750000 VND,1 year
 iPhone 11 Pro Max,256GB,11150000 VND,1 year
 iPhone 11 Pro Max,512GB,11850000 VND,1 year
-iPhone 12,64GB,94510000 VND,1 year
+iPhone 12,64GB,9451000 VND,1 year
 iPhone 12,128GB,10750000 VND,1 year
 iPhone 12,256GB,11250000 VND,1 year
 iPhone 12 Pro,128GB,12250000 VND,1 year

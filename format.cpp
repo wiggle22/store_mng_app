@@ -17,26 +17,50 @@
 int countsdt = 0;
 
 /* Formating Name */
-string formatName(string &a) {
-    // Remove leading and trailing spaces
-    while (!a.empty() && a[0] == ' ') a.erase(0, 1);
-    while (!a.empty() && a[a.length() - 1] == ' ') a.erase(a.length() - 1, 1);
+std::string formatName(std::string& a) {
+    if (a.empty()) return a;
 
-    // Capitalize the first character
-    if (!a.empty() && islower(a[0])) {
+    // Step 1: Remove leading and trailing spaces
+    size_t start = 0;
+    while (start < a.length() && a[start] == ' ') start++;
+    size_t end = a.length();
+    while (end > start && a[end - 1] == ' ') end--;
+    a = a.substr(start, end - start);
+
+    if (a.empty()) return a;
+
+    // Step 2: Remove extra spaces between words
+    std::string temp;
+    bool inSpace = false;
+    for (char c : a) {
+        if (c == ' ') {
+            if (!inSpace) {
+                temp += ' ';
+                inSpace = true;
+            }
+        } else {
+            temp += c;
+            inSpace = false;
+        }
+    }
+    a = temp;
+
+    // Step 3: Capitalize first letter and adjust case
+    if (islower(a[0])) {
         a[0] = toupper(a[0]);
     }
 
-    // Capitalize each word and lowercase other letters
-    for (int i = 1; i < a.length(); i++) {
+    for (size_t i = 1; i < a.length(); i++) {
         if (a[i - 1] == ' ' && islower(a[i])) {
+            // Capitalize first letter of each word
             a[i] = toupper(a[i]);
         } else if (a[i - 1] != ' ' && isupper(a[i])) {
+            // Lowercase subsequent letters in each word
             a[i] = tolower(a[i]);
         }
     }
 
-    // Replace "Iphone" with "iPhone"
+    // Step 4: Replace "Iphone" with "iPhone"
     size_t pos = a.find("Iphone");
     if (pos != std::string::npos) {
         a.replace(pos, 6, "iPhone");
