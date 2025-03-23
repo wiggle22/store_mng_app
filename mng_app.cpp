@@ -367,7 +367,7 @@ void deleteCustomer(node &a) {
 
         // Convert to lowercase for comparison
         transform(choice.begin(), choice.end(), choice.begin(), ::tolower);
-        if (choice == "yes" || choice == "no") {
+        if (choice == "yes") {
             deleteCustomer(a);
         }
     }
@@ -489,7 +489,7 @@ void printOneInfo(node &a) {
             cout << "[WARNING] Invalid phone number." << endl;
             cout << "Would you like to try again (yes/no)? ";
             cin >> choice;
-            if (choice == "yes" || choice == "no") {
+            if (choice == "yes") {
                 cout << "=> Customer phone number: ";
                 cin >> phoneNumber;
             } else {
@@ -524,7 +524,7 @@ bool askYesNo(const string &message) {
     cout << message << " (yes/no)? ";
     cin >> selection;
     transform(selection.begin(), selection.end(), selection.begin(), ::tolower);
-    return (selection == "yes" || selection == "no");
+    return (selection == "yes");
 }
 
 /* Function to change info of customer */
@@ -725,33 +725,40 @@ void handleMenuOption(MenuOption option, node &head) {
     gotoxy(0, 16);
     switch (option) {
         case ENTER_INFORMATION:
+            cout << "1. Enter custormer information\n";
             insertCustomer(head);
             break;
         case DELETE_INFORMATION:
+            cout << "2. Delete customer information\n";
             deleteCustomer(head);
             break;
         case DELETE_ALL:
+            cout << "3. Delete all customer information\n";
             deleteAllCustomers(head);
             break;
         case SEARCH_INFORMATION: {
+            cout << "4. Search customer information\n";
             string choice;
-            cout << "1. Search by customer phone number\n";
-            cout << "2. Search by product\n";
-            cout << "Please choose: ";
+            cout << "a. Search by customer phone number\n";
+            cout << "b. Search by product\n";
+            cout << "=> Please choose: ";
             cin >> choice;
-            if (choice == "1")
+            if (choice == "a")
                 printOneInfo(head);
-            else if (choice == "2")
+            else if (choice == "b")
                 printInfoByItem(head);
             break;
         }
         case DISPLAY_ALL_INFORMATION:
+            cout << "5. Display all customer information\n";
             printInfo(head);
             break;
         case PRODUCT_CATALOG:
+            cout << "6. Product catalog\n";
             readCategory();
             break;
         case UPDATE_INFORMATION:
+            cout << "7. Update customer information\n";
             changeCustomer(head);
             break;
         case EXIT:
