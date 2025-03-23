@@ -615,6 +615,7 @@ void changeCustomer(node &a) {
 }
 /* Function to update items in category.txt */
 
+/* Function to update items in category.txt */
 void updateCategory() {
     ifstream myfile("category.txt");
     Category tempArr[MAX_SIZE];
@@ -647,14 +648,15 @@ void updateCategory() {
     // Get product to update
     string productName, storage;
     cout << "\nEnter product name to update (exact match): ";
-    cin.clear();
-    cin.sync(); // Clear buffer
+    cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear buffer
     getline(cin, productName);
+    cin.ignore();
     productName = removeSpecialChars(productName);
     productName = formatName(productName);
 
     cout << "Enter storage capacity to update (exact match): ";
     getline(cin, storage);
+    cin.ignore();
     storage = removeSpecialChars(storage);
 
     // Find and update the item
@@ -665,13 +667,12 @@ void updateCategory() {
             
             // Ask which fields to update
             bool changePrice = askYesNo("Do you want to change the price");
-            cout << "[DEBUG] Change price selected: " << (changePrice ? "yes" : "no") << endl;
+            cout << "[DEBUG] Change price selected: " << (changePrice ? "yes" : "no") << endl; // Debug output
             if (changePrice) {
                 string rawPrice;
                 cout << "New price (e.g., 36,000,000): ";
-                cin.clear();
-                cin.sync();
-                getline(cin, rawPrice);
+                cin >> rawPrice;
+                cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear buffer after price input
                 
                 // Remove thousand separators and format for storage
                 rawPrice.erase(remove_if(rawPrice.begin(), rawPrice.end(), [](char c) {
@@ -684,11 +685,12 @@ void updateCategory() {
             }
 
             bool changeWarranty = askYesNo("Do you want to change the warranty");
-            cout << "[DEBUG] Change warranty selected: " << (changeWarranty ? "yes" : "no") << endl;
+            cout << "[DEBUG] Change warranty selected: " << (changeWarranty ? "yes" : "no") << endl; // Debug output
             if (changeWarranty) {
                 string warrantyInput;
                 cout << "New warranty (enter number of years, e.g., 2): ";
                 getline(cin, warrantyInput);
+                cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear buffer after warranty
 
                 // Clean the input: remove non-digits and validate
                 warrantyInput.erase(remove_if(warrantyInput.begin(), warrantyInput.end(), [](char c) {
@@ -697,9 +699,9 @@ void updateCategory() {
 
                 if (warrantyInput.empty()) {
                     cout << "[WARNING] Invalid warranty input. Defaulting to 1 year.\n";
-                    tempArr[i].warranty = "1 years";
+                    tempArr[i].warranty = "1 year";
                 } else {
-                    tempArr[i].warranty = warrantyInput + " years";
+                    tempArr[i].warranty = warrantyInput + " year";
                 }
             } else {
                 cout << "Warranty will remain unchanged: " << tempArr[i].warranty << endl;
