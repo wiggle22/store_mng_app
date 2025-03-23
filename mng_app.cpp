@@ -11,6 +11,7 @@
 #include <sstream>
 #include <algorithm>
 #include <set>
+#include <limits>
 
 #include "mng_app.h"
 
@@ -30,10 +31,11 @@ class Menu {
         const string* getItems() const { return items; }
     
     private:
-        static const int _numberOfItems = 8;
+        static const int _numberOfItems = 9;
         string items[_numberOfItems];
 };
-    
+ 
+/* Class menuu */
 Menu::Menu() {
     items[0] = "1. Enter customer information";
     items[1] = "2. Delete customer information";
@@ -42,7 +44,8 @@ Menu::Menu() {
     items[4] = "5. Display all customer information";
     items[5] = "6. Product catalog";
     items[6] = "7. Update customer information";
-    items[7] = "8. Exit";
+    items[7] = "8. Update product catalog";
+    items[8] = "9. Exit";
 }
 
 /* Funtion to show customer list */
@@ -56,7 +59,8 @@ node readCustomers() {
 
     string line;
     while (getline(file, line)) {
-        if (line.empty()) continue; // Skip empty lines
+        // Skip empty lines
+        if (line.empty()) continue; 
 
         Customer cus;
         stringstream ss(line);
@@ -131,8 +135,6 @@ string removeSpecialChars(const string &input) {
 /* Function to add info new customer */
 node makeNode() {
     Customer cus;
-    cout << "* Enter customer information *" << endl;
-
     // Input and format customer name
     cout << "=> Customer name: ";
     getline(cin.ignore(), cus.name);
@@ -365,7 +367,7 @@ void deleteCustomer(node &a) {
 
         // Convert to lowercase for comparison
         transform(choice.begin(), choice.end(), choice.begin(), ::tolower);
-        if (choice == "yes" || choice == "no") {
+        if (choice == "yes") {
             deleteCustomer(a);
         }
     }
@@ -487,7 +489,7 @@ void printOneInfo(node &a) {
             cout << "[WARNING] Invalid phone number." << endl;
             cout << "Would you like to try again (yes/no)? ";
             cin >> choice;
-            if (choice == "yes" || choice == "no") {
+            if (choice == "yes") {
                 cout << "=> Customer phone number: ";
                 cin >> phoneNumber;
             } else {
@@ -522,7 +524,7 @@ bool askYesNo(const string &message) {
     cout << message << " (yes/no)? ";
     cin >> selection;
     transform(selection.begin(), selection.end(), selection.begin(), ::tolower);
-    return (selection == "yes" || selection == "no");
+    return (selection == "yes");
 }
 
 /* Function to change info of customer */
@@ -611,7 +613,127 @@ void changeCustomer(node &a) {
         }
     }
 }
+/* Function to update items in category.txt */
 
+void updateCategory() {
+    ifstream myfile("category.txt");
+    Category tempArr[MAX_SIZE];
+    int count = 0;
+    bool found = false;
+
+    // Read existing categories into temporary array
+    if (!myfile.is_open()) {
+        cout << "[ERROR] Unable to open file category.txt" << endl;
+        return;
+    }
+
+    string line;
+    while (getline(myfile, line) && count < MAX_SIZE) {
+        if (line.empty()) continue;
+
+        stringstream ss(line);
+        getline(ss, tempArr[count].namepro, ',');
+        getline(ss, tempArr[count].storage, ',');
+        getline(ss, tempArr[count].price, ',');
+        getline(ss, tempArr[count].warranty);
+        count++;
+    }
+    myfile.close();
+
+    // Display current catalog
+    cout << "\nCurrent Product Catalog:\n";
+    readCategory();
+
+    // Get product to update
+    string productName, storage;
+    cout << "\nEnter product name to update (exact match): ";
+    cin.clear();
+    cin.sync(); // Clear buffer
+    getline(cin, productName);
+    productName = removeSpecialChars(productName);
+    productName = formatName(productName);
+
+    cout << "Enter storage capacity to update (exact match): ";
+    getline(cin, storage);
+    storage = removeSpecialChars(storage);
+
+    // Find and update the item
+    for (int i = 0; i < count; i++) {
+        if (tempArr[i].namepro == productName && tempArr[i].storage == storage) {
+            found = true;
+            cout << "\nUpdating: " << tempArr[i].namepro << " " << tempArr[i].storage << endl;
+            
+            // Ask which fields to update
+            bool changePrice = askYesNo("Do you want to change the price");
+            cout << "[DEBUG] Change price selected: " << (changePrice ? "yes" : "no") << endl;
+            if (changePrice) {
+                string rawPrice;
+                cout << "New price (e.g., 36,000,000): ";
+                cin.clear();
+                cin.sync();
+                getline(cin, rawPrice);
+                
+                // Remove thousand separators and format for storage
+                rawPrice.erase(remove_if(rawPrice.begin(), rawPrice.end(), [](char c) {
+                    return c == ',' || c == '.'; // Remove commas or dots used as thousand separators
+                }), rawPrice.end());
+                
+                tempArr[i].price = rawPrice; // Only update price if "yes"
+            } else {
+                cout << "Price will remain unchanged: " << tempArr[i].price << endl;
+            }
+
+            bool changeWarranty = askYesNo("Do you want to change the warranty");
+            cout << "[DEBUG] Change warranty selected: " << (changeWarranty ? "yes" : "no") << endl;
+            if (changeWarranty) {
+                string warrantyInput;
+                cout << "New warranty (enter number of years, e.g., 2): ";
+                getline(cin, warrantyInput);
+
+                // Clean the input: remove non-digits and validate
+                warrantyInput.erase(remove_if(warrantyInput.begin(), warrantyInput.end(), [](char c) {
+                    return !isdigit(c);
+                }), warrantyInput.end());
+
+                if (warrantyInput.empty()) {
+                    cout << "[WARNING] Invalid warranty input. Defaulting to 1 year.\n";
+                    tempArr[i].warranty = "1 years";
+                } else {
+                    tempArr[i].warranty = warrantyInput + " years";
+                }
+            } else {
+                cout << "Warranty will remain unchanged: " << tempArr[i].warranty << endl;
+            }
+
+            cout << "Product updated successfully.\n";
+            break;
+        }
+    }
+
+    if (!found) {
+        cout << "[WARNING] Product with specified name and storage not found.\n";
+        return;
+    }
+
+    // Write updated data back to file
+    ofstream outFile("category.txt", ios::trunc);
+    if (!outFile.is_open()) {
+        cout << "[ERROR] Unable to open file category.txt for writing" << endl;
+        return;
+    }
+
+    for (int i = 0; i < count; i++) {
+        outFile << tempArr[i].namepro << ","
+                << tempArr[i].storage << ","
+                << tempArr[i].price << ","
+                << tempArr[i].warranty << endl;
+    }
+    outFile.close();
+
+    cout << "Category file updated successfully.\n";
+    cout << "\nUpdated Product Catalog:\n";
+    readCategory();
+}
 /* MENU */
 void gotoxy(int column, int line) {
     printf("\033[%d;%dH", line, column);
@@ -720,37 +842,47 @@ void exitProgram() {
 
 /* Function to handle menu options */
 void handleMenuOption(MenuOption option, node &head) {
-    gotoxy(0, 16);
+    gotoxy(0, 17);
     switch (option) {
         case ENTER_INFORMATION:
+            cout << "1. Enter custormer information\n";
             insertCustomer(head);
             break;
         case DELETE_INFORMATION:
+            cout << "2. Delete customer information\n";
             deleteCustomer(head);
             break;
         case DELETE_ALL:
+            cout << "3. Delete all customer information\n";
             deleteAllCustomers(head);
             break;
         case SEARCH_INFORMATION: {
+            cout << "4. Search customer information\n";
             string choice;
-            cout << "1. Search by customer phone number\n";
-            cout << "2. Search by product\n";
-            cout << "Please choose: ";
+            cout << "a. Search by customer phone number\n";
+            cout << "b. Search by product\n";
+            cout << "=> Please choose: ";
             cin >> choice;
-            if (choice == "1")
+            if (choice == "a")
                 printOneInfo(head);
-            else if (choice == "2")
+            else if (choice == "b")
                 printInfoByItem(head);
             break;
         }
         case DISPLAY_ALL_INFORMATION:
+            cout << "5. Display all customer information\n";
             printInfo(head);
             break;
         case PRODUCT_CATALOG:
+            cout << "6. Product catalog\n";
             readCategory();
             break;
         case UPDATE_INFORMATION:
+            cout << "7. Update customer information\n"; 
             changeCustomer(head);
+            break;
+        case UPDATE_CATALOG:
+            updateCategory();
             break;
         case EXIT:
             exitProgram();

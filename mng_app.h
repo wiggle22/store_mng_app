@@ -14,6 +14,7 @@
 #include <sstream>
 #include <algorithm>
 #include <set>
+#include <limits>
 
 using namespace std;
 
@@ -41,6 +42,7 @@ enum MenuOption {
     DISPLAY_ALL_INFORMATION,
     PRODUCT_CATALOG,
     UPDATE_INFORMATION,
+    UPDATE_CATALOG,
     EXIT
 };
 
