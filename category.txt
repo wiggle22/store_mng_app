@@ -41,4 +41,4 @@ iPhone 14 Pro,1TB,33990000 VND,1 year
 iPhone 14 Pro Max,128GB,26440000 VND,1 year
 iPhone 14 Pro Max,256GB,29690000 VND,1 year
 iPhone 14 Pro Max,512GB,35990000 VND,1 year
-iPhone 14 Pro Max,1TB,41790000 VND,1 year
+iPhone 14 Pro Max,1TB,900000000,1 years
