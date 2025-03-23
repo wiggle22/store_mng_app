@@ -616,11 +616,7 @@ void changeCustomer(node &a) {
     }
 }
 /* Function to update items in category.txt */
-/* Function to update items in category.txt */
-/* Function to update items in category.txt */
-/* Function to update items in category.txt */
-/* Function to update items in category.txt */
-/* Function to update items in category.txt */
+
 void updateCategory() {
     ifstream myfile("category.txt");
     Category tempArr[MAX_SIZE];
