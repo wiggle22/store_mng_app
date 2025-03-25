@@ -12,7 +12,6 @@
 #include <algorithm>
 #include <set>
 #include <limits>
-
 #include "mng_app.h"
 
 ofstream file;
@@ -31,7 +30,7 @@ class Menu {
         const string* getItems() const { return items; }
     
     private:
-        static const int _numberOfItems = 9;
+        static const int _numberOfItems = 10;
         string items[_numberOfItems];
 };
  
@@ -45,7 +44,8 @@ Menu::Menu() {
     items[5] = "6. Product catalog";
     items[6] = "7. Update customer information";
     items[7] = "8. Update product catalog";
-    items[8] = "9. Exit";
+    items[8] = "9. Add new catalog";
+    items[9] = "10. Exit";
 }
 
 /* Funtion to show customer list */
@@ -587,7 +587,17 @@ void changeCustomer(node &a) {
 
                 if (askYesNo("Do you want to change the warranty period")) {
                     cout << "New warranty period: ";
-                    cin >> check.warranty;
+                    cin >> check.warranty<< "[DEBUG] Change price selected: " << (changePrice ? "yes" : "no") << endl; // Debug output
+            if (changePrice) {
+                string rawPrice;
+                cout << "New price (e.g., 36,000,000): ";
+                cin >> rawPrice;
+                cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear buffer after price input
+                
+                // Remove thousand separators and format for storage
+                rawPrice.erase(remove_if(rawPrice.begin(), rawPrice.end(), [](char c) {
+                    return c == ',' || c == '.'; // Remove commas or dots used as thousand separators
+                }), rawPrice.end());
                     check.warranty += " years";
                 }
 
@@ -649,13 +659,13 @@ void updateCategory() {
     cout << "\nEnter product name to update (exact match): ";
     cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear buffer
     getline(cin, productName);
-    cin.ignore();
+    
     productName = removeSpecialChars(productName);
     productName = formatName(productName);
 
     cout << "Enter storage capacity to update (exact match): ";
     getline(cin, storage);
-    cin.ignore();
+   
     storage = removeSpecialChars(storage);
 
     // Find and update the item
@@ -666,19 +676,8 @@ void updateCategory() {
             
             // Ask which fields to update
             bool changePrice = askYesNo("Do you want to change the price");
-            cout << "[DEBUG] Change price selected: " << (changePrice ? "yes" : "no") << endl; // Debug output
-            if (changePrice) {
-                string rawPrice;
-                cout << "New price (e.g., 36,000,000): ";
-                cin >> rawPrice;
-                cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear buffer after price input
-                
-                // Remove thousand separators and format for storage
-                rawPrice.erase(remove_if(rawPrice.begin(), rawPrice.end(), [](char c) {
-                    return c == ',' || c == '.'; // Remove commas or dots used as thousand separators
-                }), rawPrice.end());
-                
-                tempArr[i].price = rawPrice; // Only update price if "yes"
+            cout 
+                tempArr[i].price = rawPrice + "VND"; // Only update price if "yes"
             } else {
                 cout << "Price will remain unchanged: " << tempArr[i].price << endl;
             }
@@ -688,19 +687,18 @@ void updateCategory() {
             if (changeWarranty) {
                 string warrantyInput;
                 cout << "New warranty (enter number of years, e.g., 2): ";
-                getline(cin, warrantyInput);
-                cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear buffer after warranty
-
-                // Clean the input: remove non-digits and validate
-                warrantyInput.erase(remove_if(warrantyInput.begin(), warrantyInput.end(), [](char c) {
-                    return !isdigit(c);
-                }), warrantyInput.end());
-
+                cin >> warrantyInput;
+                cin.ignore(); // Clear buffer after warranty
                 if (warrantyInput.empty()) {
                     cout << "[WARNING] Invalid warranty input. Defaulting to 1 year.\n";
                     tempArr[i].warranty = "1 year";
                 } else {
-                    tempArr[i].warranty = warrantyInput + " year";
+                    int years = stoi(warrantyInput); // Convert string to integer
+                    if (years >= 2) {
+                        tempArr[i].warranty = warrantyInput + " years";
+                    } else {
+                         tempArr[i].warranty = warrantyInput + " year";
+                    }
                 }
             } else {
                 cout << "Warranty will remain unchanged: " << tempArr[i].warranty << endl;
@@ -734,6 +732,80 @@ void updateCategory() {
     cout << "Category file updated successfully.\n";
     cout << "\nUpdated Product Catalog:\n";
     readCategory();
+}
+
+void addNewProduct() {
+    Category newProduct;
+    // Input product name
+    cout << "=> Product name: ";
+    cin.ignore();
+    getline(cin, newProduct.namepro);
+    newProduct.namepro = removeSpecialChars(newProduct.namepro);
+    newProduct.namepro = formatName(newProduct.namepro);
+    if (newProduct.namepro.empty()) {
+        cout << "[WARNING] Product name cannot be empty.\n";
+        return;
+    }
+
+    // Input storage capacity
+    cout << "=> Storage capacity: ";
+    cin.ignore();
+    getline(cin, newProduct.storage);
+    newProduct.storage = removeSpecialChars(newProduct.storage);
+    if (newProduct.storage.empty()) {
+        cout << "[WARNING] Storage capacity cannot be empty.\n";
+        return;
+    }
+
+    // Input price
+    string priceInput;
+    cout << "=> New price (e.g., 36,000,000):  ";
+    cin.ignore();
+    cin >> priceInput;     
+    newProduct.price = formatPrice(priceInput);
+    cout << newProduct.price << endl;
+    if (priceInput.empty()) {
+        cout << "[WARNING] Invalid price. Please enter a numeric value.\n";
+        return;
+    }
+
+    // Input warranty
+    string warrantyInput;
+    cout << "=> Warranty period (in years, e.g., 2): ";
+    cin.ignore();
+    getline(cin, warrantyInput);
+    // Validate warranty input
+    bool validWarranty = true;
+    for (char ch : warrantyInput) {
+        if (!isdigit(ch)) {
+            validWarranty = false;
+            break;
+        }
+    }
+    if (!validWarranty || warrantyInput.empty()) {
+        cout << "[WARNING] Invalid warranty period. Please enter a positive integer.\n";
+        return;
+    }
+    newProduct.warranty = warrantyInput + " years";
+
+    // Open file in append mode
+    ofstream outFile("category.txt", ios::app);
+    if (!outFile.is_open()) {
+        cout << "[ERROR] Unable to open file category.txt for writing" << endl;
+        return;
+    }
+
+    // Write new product to file in CSV format
+    outFile << newProduct.namepro << ","
+            << newProduct.storage << ","
+            << newProduct.price << ","
+            << newProduct.warranty << endl;
+
+    outFile.close();
+
+    cout << "New product added successfully.\n";
+    cout << "\nUpdated Product Catalog:\n";
+    readCategory(); // Display updated catalog
 }
 /* MENU */
 void gotoxy(int column, int line) {
@@ -883,7 +955,12 @@ void handleMenuOption(MenuOption option, node &head) {
             changeCustomer(head);
             break;
         case UPDATE_CATALOG:
+            cout << "8. Update catalog\n";
             updateCategory();
+            break;
+        case ADD_NEW_PRODUCT:
+            cout << "9. Add new catalog\n";
+            addNewProduct();
             break;
         case EXIT:
             exitProgram();
