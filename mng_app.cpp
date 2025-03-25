@@ -121,15 +121,14 @@ void readCategory() {
     }
 }
 
-/* Function to remove non-alphanumeric characters */
-string removeSpecialChars(const string &input) {
-    string result;
-    for (char ch : input) {
-        if (isalnum(ch) || ch == ' ' || ch == '.') {  // Keep letters, digits, spaces, and dots
-            result += ch;
+/* Function to remove specical characters */
+std::string removeSpecialChars(std::string a) {
+    if (a.length() >= 2 && a[0] == '[') {  // 
+        if (a[1] == 'A' || a[1] == 'B' || a[1] == 'C' || a[1] == 'D') {
+            return a.substr(2);  // Remove "[ X"
         }
     }
-    return result;
+    return a;
 }
 
 /* Function to add info new customer */
