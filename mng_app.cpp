@@ -566,41 +566,6 @@ void changeCustomer(node &a) {
                     check.phonenumber = formatPhoneNumber(check.phonenumber);
                 }
 
-                cin.ignore(); // Clear newline character after input
-                if (askYesNo("Do you want to change the product")) {
-                    cout << "New product: ";
-                    getline(cin, check.item);
-                    check.item = formatName(check.item);
-                }
-
-                if (askYesNo("Do you want to change the storage")) {
-                    cout << "New storage: ";
-                    cin >> check.storage;
-                    check.storage = formatPrice(check.storage);
-                }
-
-                if (askYesNo("Do you want to change the price")) {
-                    cout << "New price: ";
-                    cin >> check.price;
-                    check.price = formatPrice(check.price);
-                }
-
-                if (askYesNo("Do you want to change the warranty period")) {
-                    cout << "New warranty period: ";
-                    cin >> check.warranty<< "[DEBUG] Change price selected: " << (changePrice ? "yes" : "no") << endl; // Debug output
-            if (changePrice) {
-                string rawPrice;
-                cout << "New price (e.g., 36,000,000): ";
-                cin >> rawPrice;
-                cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear buffer after price input
-                
-                // Remove thousand separators and format for storage
-                rawPrice.erase(remove_if(rawPrice.begin(), rawPrice.end(), [](char c) {
-                    return c == ',' || c == '.'; // Remove commas or dots used as thousand separators
-                }), rawPrice.end());
-                    check.warranty += " years";
-                }
-
                 // Update customer information
                 i->cus = check;
 
@@ -622,7 +587,6 @@ void changeCustomer(node &a) {
         }
     }
 }
-/* Function to update items in category.txt */
 
 /* Function to update items in category.txt */
 void updateCategory() {
@@ -657,9 +621,7 @@ void updateCategory() {
     // Get product to update
     string productName, storage;
     cout << "\nEnter product name to update (exact match): ";
-    cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear buffer
-    getline(cin, productName);
-    
+    getline(cin.ignore(), productName);
     productName = removeSpecialChars(productName);
     productName = formatName(productName);
 
@@ -676,8 +638,19 @@ void updateCategory() {
             
             // Ask which fields to update
             bool changePrice = askYesNo("Do you want to change the price");
-            cout 
-                tempArr[i].price = rawPrice + "VND"; // Only update price if "yes"
+            cout << "[DEBUG] Change price selected: " << (changePrice ? "yes" : "no") << endl; // Debug output
+            if (changePrice) {
+                string rawPrice;
+                cout << "New price (e.g., 36,000,000): ";
+                cin >> rawPrice;
+                cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear buffer after price input
+                
+                // Remove thousand separators and format for storage
+                rawPrice.erase(remove_if(rawPrice.begin(), rawPrice.end(), [](char c) {
+                    return c == ',' || c == '.'; // Remove commas or dots used as thousand separators
+                }), rawPrice.end());
+                
+                tempArr[i].price = rawPrice; // Only update price if "yes"
             } else {
                 cout << "Price will remain unchanged: " << tempArr[i].price << endl;
             }
@@ -749,8 +722,7 @@ void addNewProduct() {
 
     // Input storage capacity
     cout << "=> Storage capacity: ";
-    cin.ignore();
-    getline(cin, newProduct.storage);
+    cin >> newProduct.storage;
     newProduct.storage = removeSpecialChars(newProduct.storage);
     if (newProduct.storage.empty()) {
         cout << "[WARNING] Storage capacity cannot be empty.\n";
@@ -758,35 +730,38 @@ void addNewProduct() {
     }
 
     // Input price
-    string priceInput;
     cout << "=> New price (e.g., 36,000,000):  ";
-    cin.ignore();
-    cin >> priceInput;     
-    newProduct.price = formatPrice(priceInput);
-    cout << newProduct.price << endl;
-    if (priceInput.empty()) {
+    cin >> newProduct.price;     
+    newProduct.price = newProduct.price + " VND";
+    if (newProduct.price.empty()) {
         cout << "[WARNING] Invalid price. Please enter a numeric value.\n";
         return;
     }
 
     // Input warranty
-    string warrantyInput;
     cout << "=> Warranty period (in years, e.g., 2): ";
-    cin.ignore();
-    getline(cin, warrantyInput);
+    cin >> newProduct.warranty;
     // Validate warranty input
     bool validWarranty = true;
-    for (char ch : warrantyInput) {
+    for (char ch : newProduct.warranty) {
         if (!isdigit(ch)) {
             validWarranty = false;
             break;
         }
     }
-    if (!validWarranty || warrantyInput.empty()) {
+    
+
+    if (!validWarranty || newProduct.warranty.empty()) {
         cout << "[WARNING] Invalid warranty period. Please enter a positive integer.\n";
         return;
     }
-    newProduct.warranty = warrantyInput + " years";
+
+    int years = stoi(newProduct.warranty); // Convert string to integer
+    if (years >= 2) {
+        newProduct.warranty = newProduct.warranty + " years";
+    } else {
+        newProduct.warranty = newProduct.warranty + " year";
+    }
 
     // Open file in append mode
     ofstream outFile("category.txt", ios::app);
@@ -807,6 +782,7 @@ void addNewProduct() {
     cout << "\nUpdated Product Catalog:\n";
     readCategory(); // Display updated catalog
 }
+
 /* MENU */
 void gotoxy(int column, int line) {
     printf("\033[%d;%dH", line, column);
@@ -915,7 +891,7 @@ void exitProgram() {
 
 /* Function to handle menu options */
 void handleMenuOption(MenuOption option, node &head) {
-    gotoxy(0, 17);
+    gotoxy(0, 18);
     switch (option) {
         case ENTER_INFORMATION:
             cout << "1. Enter custormer information\n";
