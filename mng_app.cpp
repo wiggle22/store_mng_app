@@ -163,14 +163,25 @@ node makeNode() {
 
         ifstream myfile("category.txt");
         string line;
+        int i = 0;
 
-        while (getline(myfile, line)) {
-            if (line.find(cus.item) != string::npos) {
+        if (myfile.is_open()) {
+            while (!myfile.eof()) {
+                getline(myfile, arr[i].namepro, ',');
+                getline(myfile, arr[i].storage, ',');
+                getline(myfile, arr[i].price, ',');
+                getline(myfile, arr[i].warranty);
+                i++;
+            }
+            myfile.close();
+        }
+
+        for (int j = 0; j < i; j++) {
+            if (arr[j].namepro == cus.item) {
                 found = true;
                 break;
             }
         }
-        myfile.close();
 
         if (!found) {
             cout << "[WARNING] The product you entered is not in the catalog.\n";
