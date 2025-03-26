@@ -12,7 +12,6 @@
 #include <algorithm>
 #include <set>
 #include <limits>
-
 #include "mng_app.h"
 
 ofstream file;
@@ -31,7 +30,7 @@ class Menu {
         const string* getItems() const { return items; }
     
     private:
-        static const int _numberOfItems = 9;
+        static const int _numberOfItems = 10;
         string items[_numberOfItems];
 };
  
@@ -45,7 +44,8 @@ Menu::Menu() {
     items[5] = "6. Product catalog";
     items[6] = "7. Update customer information";
     items[7] = "8. Update product catalog";
-    items[8] = "9. Exit";
+    items[8] = "9. Add new catalog";
+    items[9] = "10. Exit";
 }
 
 /* Funtion to show customer list */
@@ -128,6 +128,7 @@ std::string removeSpecialChars(std::string a) {
             return a.substr(2);  // Remove "[ X"
         }
     }
+    if (a[0] == '\n') return a.substr(1);
     return a;
 }
 
@@ -538,7 +539,8 @@ void changeCustomer(node &a) {
     bool found = false;
 
     cout << "=> Customer phone number: ";
-    cin >> phoneNumber;
+    getline(cin.ignore(), phoneNumber);
+    phoneNumber = removeSpecialChars(phoneNumber);
 
     while (!found) {
         for (node i = a; i != NULL; i = i->next) {
@@ -566,31 +568,6 @@ void changeCustomer(node &a) {
                     check.phonenumber = formatPhoneNumber(check.phonenumber);
                 }
 
-                cin.ignore(); // Clear newline character after input
-                if (askYesNo("Do you want to change the product")) {
-                    cout << "New product: ";
-                    getline(cin, check.item);
-                    check.item = formatName(check.item);
-                }
-
-                if (askYesNo("Do you want to change the storage")) {
-                    cout << "New storage: ";
-                    cin >> check.storage;
-                    check.storage = formatPrice(check.storage);
-                }
-
-                if (askYesNo("Do you want to change the price")) {
-                    cout << "New price: ";
-                    cin >> check.price;
-                    check.price = formatPrice(check.price);
-                }
-
-                if (askYesNo("Do you want to change the warranty period")) {
-                    cout << "New warranty period: ";
-                    cin >> check.warranty;
-                    check.warranty += " years";
-                }
-
                 // Update customer information
                 i->cus = check;
 
@@ -612,7 +589,6 @@ void changeCustomer(node &a) {
         }
     }
 }
-/* Function to update items in category.txt */
 
 /* Function to update items in category.txt */
 void updateCategory() {
@@ -647,15 +623,13 @@ void updateCategory() {
     // Get product to update
     string productName, storage;
     cout << "\nEnter product name to update (exact match): ";
-    cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear buffer
-    getline(cin, productName);
-    cin.ignore();
+    getline(cin.ignore(), productName);
     productName = removeSpecialChars(productName);
     productName = formatName(productName);
 
     cout << "Enter storage capacity to update (exact match): ";
     getline(cin, storage);
-    cin.ignore();
+   
     storage = removeSpecialChars(storage);
 
     // Find and update the item
@@ -688,19 +662,18 @@ void updateCategory() {
             if (changeWarranty) {
                 string warrantyInput;
                 cout << "New warranty (enter number of years, e.g., 2): ";
-                getline(cin, warrantyInput);
-                cin.ignore(numeric_limits<streamsize>::max(), '\n'); // Clear buffer after warranty
-
-                // Clean the input: remove non-digits and validate
-                warrantyInput.erase(remove_if(warrantyInput.begin(), warrantyInput.end(), [](char c) {
-                    return !isdigit(c);
-                }), warrantyInput.end());
-
+                cin >> warrantyInput;
+                cin.ignore(); // Clear buffer after warranty
                 if (warrantyInput.empty()) {
                     cout << "[WARNING] Invalid warranty input. Defaulting to 1 year.\n";
                     tempArr[i].warranty = "1 year";
                 } else {
-                    tempArr[i].warranty = warrantyInput + " year";
+                    int years = stoi(warrantyInput); // Convert string to integer
+                    if (years >= 2) {
+                        tempArr[i].warranty = warrantyInput + " years";
+                    } else {
+                         tempArr[i].warranty = warrantyInput + " year";
+                    }
                 }
             } else {
                 cout << "Warranty will remain unchanged: " << tempArr[i].warranty << endl;
@@ -735,6 +708,83 @@ void updateCategory() {
     cout << "\nUpdated Product Catalog:\n";
     readCategory();
 }
+
+void addNewProduct() {
+    Category newProduct;
+    // Input product name
+    cout << "=> Product name: ";
+    cin.ignore();
+    getline(cin, newProduct.namepro);
+    newProduct.namepro = removeSpecialChars(newProduct.namepro);
+    newProduct.namepro = formatName(newProduct.namepro);
+    if (newProduct.namepro.empty()) {
+        cout << "[WARNING] Product name cannot be empty.\n";
+        return;
+    }
+
+    // Input storage capacity
+    cout << "=> Storage capacity: ";
+    cin >> newProduct.storage;
+    newProduct.storage = removeSpecialChars(newProduct.storage);
+    if (newProduct.storage.empty()) {
+        cout << "[WARNING] Storage capacity cannot be empty.\n";
+        return;
+    }
+
+    // Input price
+    cout << "=> New price (e.g., 36,000,000):  ";
+    cin >> newProduct.price;     
+    newProduct.price = newProduct.price + " VND";
+    if (newProduct.price.empty()) {
+        cout << "[WARNING] Invalid price. Please enter a numeric value.\n";
+        return;
+    }
+
+    // Input warranty
+    cout << "=> Warranty period (in years, e.g., 2): ";
+    cin >> newProduct.warranty;
+    // Validate warranty input
+    bool validWarranty = true;
+    for (char ch : newProduct.warranty) {
+        if (!isdigit(ch)) {
+            validWarranty = false;
+            break;
+        }
+    }
+    
+
+    if (!validWarranty || newProduct.warranty.empty()) {
+        cout << "[WARNING] Invalid warranty period. Please enter a positive integer.\n";
+        return;
+    }
+
+    int years = stoi(newProduct.warranty); // Convert string to integer
+    if (years >= 2) {
+        newProduct.warranty = newProduct.warranty + " years";
+    } else {
+        newProduct.warranty = newProduct.warranty + " year";
+    }
+
+    // Open file in append mode
+    ofstream outFile("category.txt", ios::app);
+    if (!outFile.is_open()) {
+        cout << "[ERROR] Unable to open file category.txt for writing" << endl;
+        return;
+    }
+
+    // Write new product to file in CSV format
+    outFile << newProduct.namepro << ","
+            << newProduct.storage << ","
+            << newProduct.price << ","
+            << newProduct.warranty << endl;
+
+    outFile.close();
+
+    cout << "New product added successfully.\n";
+    cout << "\nUpdated Product Catalog:\n";
+    readCategory(); // Display updated catalog
+}
+
 /* MENU */
 void gotoxy(int column, int line) {
     printf("\033[%d;%dH", line, column);
@@ -843,7 +893,7 @@ void exitProgram() {
 
 /* Function to handle menu options */
 void handleMenuOption(MenuOption option, node &head) {
-    gotoxy(0, 17);
+    gotoxy(0, 18);
     switch (option) {
         case ENTER_INFORMATION:
             cout << "1. Enter custormer information\n";
@@ -863,7 +913,8 @@ void handleMenuOption(MenuOption option, node &head) {
             cout << "a. Search by customer phone number\n";
             cout << "b. Search by product\n";
             cout << "=> Please choose: ";
-            cin >> choice;
+            getline(cin.ignore(), choice);
+            choice = removeSpecialChars(choice);
             if (choice == "a")
                 printOneInfo(head);
             else if (choice == "b")
@@ -883,7 +934,12 @@ void handleMenuOption(MenuOption option, node &head) {
             changeCustomer(head);
             break;
         case UPDATE_CATALOG:
+            cout << "8. Update catalog\n";
             updateCategory();
+            break;
+        case ADD_NEW_PRODUCT:
+            cout << "9. Add new catalog\n";
+            addNewProduct();
             break;
         case EXIT:
             exitProgram();

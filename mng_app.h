@@ -43,6 +43,7 @@ enum MenuOption {
     PRODUCT_CATALOG,
     UPDATE_INFORMATION,
     UPDATE_CATALOG,
+    ADD_NEW_PRODUCT,
     EXIT
 };
 
