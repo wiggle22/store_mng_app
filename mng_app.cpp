@@ -128,6 +128,7 @@ std::string removeSpecialChars(std::string a) {
             return a.substr(2);  // Remove "[ X"
         }
     }
+    if (a[0] == '\n') return a.substr(1);
     return a;
 }
 
@@ -538,7 +539,8 @@ void changeCustomer(node &a) {
     bool found = false;
 
     cout << "=> Customer phone number: ";
-    cin >> phoneNumber;
+    getline(cin.ignore(), phoneNumber);
+    phoneNumber = removeSpecialChars(phoneNumber);
 
     while (!found) {
         for (node i = a; i != NULL; i = i->next) {
@@ -911,7 +913,8 @@ void handleMenuOption(MenuOption option, node &head) {
             cout << "a. Search by customer phone number\n";
             cout << "b. Search by product\n";
             cout << "=> Please choose: ";
-            cin >> choice;
+            getline(cin.ignore(), choice);
+            choice = removeSpecialChars(choice);
             if (choice == "a")
                 printOneInfo(head);
             else if (choice == "b")
