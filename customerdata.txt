@@ -1,1 +1,2 @@
-Bhien Nguyen,23 years old,0901954894,iPhone 14 Pro Max,256GB,29.690.000 VND,23/03/2025,1 year
+Nguyen Hien,23 years old,0901954894,iPhone 14 Pro Max,256GB,29.690.000 VND,23/03/2025,1 year
+Nguyen Sinh,23 years old,0523921880,iPhone X,64GB,5.750.000 VND,26/03/2025,1 year
