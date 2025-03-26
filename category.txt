@@ -42,3 +42,15 @@ iPhone 14 Pro Max,128GB,26440000 VND,1 year
 iPhone 14 Pro Max,256GB,29690000 VND,1 year
 iPhone 14 Pro Max,512GB,35990000 VND,1 year
 iPhone 14 Pro Max,1TB,900000000,1 years
+iPhone 15,128GB,19090000 VND,1 year
+iPhone 15,256GB,22290000 VND,1 year
+iPhone 15,512GB,23490000 VND,1 year
+iPhone 15 Pro,128GB,24750000 VND,1 year
+iPhone 15 Pro,256GB,27390000 VND,1 year
+iPhone 15 Pro,512GB,32990000 VND,1 year
+iPhone 15 Pro,1TB,33990000 VND,1 year
+iPhone 15 Pro Max,128GB,26440000 VND,1 year
+iPhone 15 Pro Max,256GB,29690000 VND,1 year
+iPhone 15 Pro Max,512GB,35990000 VND,1 year
+iPhone 15 Pro Max,1TB,900000000 VND,1 year
+iPhone 16 Pro,512GBB,50000000 VND,3 years

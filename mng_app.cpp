@@ -440,6 +440,8 @@ bool checkItem(const string& choice, const string& item) {
         return (item == "iPhone 13" || item == "iPhone 13 Pro" || item == "iPhone 13 Pro Max");
     if (choice == "5") 
         return (item == "iPhone 14" || item == "iPhone 14 Pro" || item == "iPhone 14 Pro Max");
+    if (choice == "6") 
+        return (item == "iPhone 15" || item == "iPhone 15 Pro" || item == "iPhone 15 Pro Max");
     return false;
 }
 
@@ -456,8 +458,14 @@ void printInfoByItem(node &a) {
     cout << "3. iPhone 12 Series\n";
     cout << "4. iPhone 13 Series\n";
     cout << "5. iPhone 14 Series\n";
+    cout << "6. iPhone 15 Series\n";
     cout << "Select product: ";
-    cin >> choice;
+
+    while(true) {
+        cin >> choice;
+        if (choice == "1" || choice == "2" || choice == "3" || choice == "4" || choice == "5" || choice == "6" ) break;
+        else cout << "Please try again: ";
+    }
 
     bool found = false;
     printHeader();
