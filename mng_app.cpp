@@ -12,6 +12,8 @@
 #include <algorithm>
 #include <set>
 #include <limits>
+#include <pthread.h>
+
 #include "mng_app.h"
 
 ofstream file;
@@ -966,8 +968,8 @@ void handleMenuOption(MenuOption option, node &head) {
     }
 }
 
-/* Main function */
-int main() {
+// thread app
+void* runApp(void* arg){
     node head = NULL;
     file.open("customerdata.txt", ios::out | ios::app);
     head = readCustomers();
@@ -1014,6 +1016,43 @@ int main() {
             cout << (char)1;  // Draw the cursor at the new position
         }
     }
+    return 0;
+}
 
+// thread clock
+void* clockThread(void* arg) {
+    while (true) {
+        printf("\033[s");   // Lưu vị trí con trỏ hiện tại
+        printf("\033[1;50H"); // Di chuyển con trỏ đến dòng 1, cột 50
+        time_t now = time(0);
+        tm* ltm = localtime(&now);
+        printf("🕒 %02d:%02d:%02d", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
+        printf("\033[u");   // Khôi phục vị trí con trỏ cũ
+        fflush(stdout);     // Đảm bảo in ra ngay
+        sleep(1);
+    }
+    return NULL;
+}
+
+
+/* Main function */
+int main() {
+    pthread_t clockT, appT;
+
+    // Tạo luồng đồng hồ
+    if (pthread_create(&clockT, NULL, clockThread, NULL) != 0) {
+        cerr << "Lỗi: Không thể tạo luồng đồng hồ!" << endl;
+        return 1;
+    }
+
+    // Tạo luồng chạy ứng dụng chính
+    if (pthread_create(&appT, NULL, runApp, NULL) != 0) { 
+        cerr << "Lỗi: Không thể tạo luồng ứng dụng!" << endl;
+        return 1;
+    }
+
+    // Đợi cả hai luồng kết thúc
+    pthread_join(clockT, NULL);
+    pthread_join(appT, NULL);
     return 0;
 }
