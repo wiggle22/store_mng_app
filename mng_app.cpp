@@ -879,9 +879,10 @@ int move() {
 /* Print Menu */
 void Menu::printMenu() {
     for (int i = 0; i < _numberOfItems; i++) {
-        gotoxy(3, 8 + i);
+        gotoxy(3, 10 + i);
         cout << items[i];
-        usleep(50000); // Reduce delay for faster display
+        /* Reduce delay for faster display */
+        usleep(50000);
     }
     cout << "\n=============================================================";
 }
@@ -889,14 +890,21 @@ void Menu::printMenu() {
 /* Clear Menu */
 void Menu::clearMenu() {
     for (int i = 0; i < _numberOfItems; i++) {
-        gotoxy(0, 7 + i);
-        cout << string(items[i].size() + 3, ' '); // Clear by printing spaces
-        usleep(50000); // Reduce delay
+        gotoxy(0, 8 + i);
+        /* Clear by printing spaces */
+        cout << string(items[i].size() + 3, ' ');
+        /* Reduce delay */
+        usleep(50000);
     }
 }
     
 /* Function to display the banner title */
 void printBanner() {
+    /* Draw border for clock */
+    cout << "\t \t \t.-------------.\n";
+    cout << "\t \t \t|    CLOCK    |\n";
+    cout << "\t \t \t'-------------'";
+    /* Draw app banner */
     cout << "\n\n=============================================================";
     cout << "\n \t-----------------------------------------------";
     cout << "\n\t| Customer Management System for iPhone Store |";
@@ -906,30 +914,30 @@ void printBanner() {
 /* Function to exit the program */
 void exitProgram() {
     system("clear");
-    cout << "******* Have a great day *******" << endl;
-    cout << "************ See you again *************" << endl;
+    cout << "\n******* Have a great day *******\n" << endl;
+    cout << "************ See you again *************\n" << endl;
     file.close();
     exit(0);
 }
 
 /* Function to handle menu options */
 void handleMenuOption(MenuOption option, node &head) {
-    gotoxy(0, 19);
+    gotoxy(0, 21);
     switch (option) {
         case ENTER_INFORMATION:
-            cout << "1. Enter custormer information\n";
+            cout << "\n1. Enter custormer information\n";
             insertCustomer(head);
             break;
         case DELETE_INFORMATION:
-            cout << "2. Delete customer information\n";
+            cout << "\n2. Delete customer information\n";
             deleteCustomer(head);
             break;
         case DELETE_ALL:
-            cout << "3. Delete all customer information\n";
+            cout << "\n3. Delete all customer information\n";
             deleteAllCustomers(head);
             break;
         case SEARCH_INFORMATION: {
-            cout << "4. Search customer information\n";
+            cout << "\n4. Search customer information\n";
             string choice;
             cout << "a. Search by customer phone number\n";
             cout << "b. Search by product\n";
@@ -943,23 +951,23 @@ void handleMenuOption(MenuOption option, node &head) {
             break;
         }
         case DISPLAY_ALL_INFORMATION:
-            cout << "5. Display all customer information\n";
+            cout << "\n5. Display all customer information\n";
             printInfo(head);
             break;
         case PRODUCT_CATALOG:
-            cout << "6. Product catalog\n";
+            cout << "\n6. Product catalog\n";
             readCategory();
             break;
         case UPDATE_INFORMATION:
-            cout << "7. Update customer information\n"; 
+            cout << "\n7. Update customer information\n"; 
             changeCustomer(head);
             break;
         case UPDATE_CATALOG:
-            cout << "8. Update catalog\n";
+            cout << "\n8. Update catalog\n";
             updateCategory();
             break;
         case ADD_NEW_PRODUCT:
-            cout << "9. Add new catalog\n";
+            cout << "\n9. Add new catalog\n";
             addNewProduct();
             break;
         case EXIT:
@@ -976,7 +984,7 @@ void* runApp(void* arg){
     Menu menu;
     int x;
     /* Starting position of the cursor */
-    int line = 8;  
+    int line = 10;  
     bool exitProgram = false;
 
     /* Display banner and menu */
@@ -996,17 +1004,17 @@ void* runApp(void* arg){
                 /* Move down */
                 case 3: 
                     line++;
-                    if (line >= menu.getNumberOfItems() + 8) line = 8;
+                    if (line >= menu.getNumberOfItems() + 10) line = 10;
                     break;
                 case 2:
                 /* Move up */
                 case 4: 
                     line--;
-                    if (line < 8) line = menu.getNumberOfItems() + 8 - 1;
+                    if (line < 10) line = menu.getNumberOfItems() + 10 - 1;
                     break;
                 /* Confirm menu selection */
                 case 5:
-                    handleMenuOption(static_cast<MenuOption>(line - 7), head);
+                    handleMenuOption(static_cast<MenuOption>(line - 9), head);
                     system("read -p 'Press any key to continue...' var");
                     system("clear");
                     printBanner();
