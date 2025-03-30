@@ -12,6 +12,8 @@
 #include <algorithm>
 #include <set>
 #include <limits>
+#include <pthread.h>
+
 #include "mng_app.h"
 
 ofstream file;
@@ -877,9 +879,10 @@ int move() {
 /* Print Menu */
 void Menu::printMenu() {
     for (int i = 0; i < _numberOfItems; i++) {
-        gotoxy(3, 7 + i);
+        gotoxy(3, 10 + i);
         cout << items[i];
-        usleep(50000); // Reduce delay for faster display
+        /* Reduce delay for faster display */
+        usleep(50000);
     }
     cout << "\n=============================================================";
 }
@@ -887,47 +890,54 @@ void Menu::printMenu() {
 /* Clear Menu */
 void Menu::clearMenu() {
     for (int i = 0; i < _numberOfItems; i++) {
-        gotoxy(0, 7 + i);
-        cout << string(items[i].size() + 3, ' '); // Clear by printing spaces
-        usleep(50000); // Reduce delay
+        gotoxy(0, 8 + i);
+        /* Clear by printing spaces */
+        cout << string(items[i].size() + 3, ' ');
+        /* Reduce delay */
+        usleep(50000);
     }
 }
     
 /* Function to display the banner title */
 void printBanner() {
-    cout << "\n=============================================================";
-    cout << "\n \t\t-----------------------------------------------";
-    cout << "\n\t\t| Customer Management System for iPhone Store |";
-    cout << "\n \t\t-----------------------------------------------";
+    /* Draw border for clock */
+    cout << "\t \t \t.-------------.\n";
+    cout << "\t \t \t|    CLOCK    |\n";
+    cout << "\t \t \t'-------------'";
+    /* Draw app banner */
+    cout << "\n\n=============================================================";
+    cout << "\n \t-----------------------------------------------";
+    cout << "\n\t| Customer Management System for iPhone Store |";
+    cout << "\n \t-----------------------------------------------";
 }
 
 /* Function to exit the program */
 void exitProgram() {
     system("clear");
-    cout << "******* Have a great day *******" << endl;
-    cout << "************ See you again *************" << endl;
+    cout << "\n******* Have a great day *******\n" << endl;
+    cout << "************ See you again *************\n" << endl;
     file.close();
     exit(0);
 }
 
 /* Function to handle menu options */
 void handleMenuOption(MenuOption option, node &head) {
-    gotoxy(0, 18);
+    gotoxy(0, 21);
     switch (option) {
         case ENTER_INFORMATION:
-            cout << "1. Enter custormer information\n";
+            cout << "\n1. Enter custormer information\n";
             insertCustomer(head);
             break;
         case DELETE_INFORMATION:
-            cout << "2. Delete customer information\n";
+            cout << "\n2. Delete customer information\n";
             deleteCustomer(head);
             break;
         case DELETE_ALL:
-            cout << "3. Delete all customer information\n";
+            cout << "\n3. Delete all customer information\n";
             deleteAllCustomers(head);
             break;
         case SEARCH_INFORMATION: {
-            cout << "4. Search customer information\n";
+            cout << "\n4. Search customer information\n";
             string choice;
             cout << "a. Search by customer phone number\n";
             cout << "b. Search by product\n";
@@ -941,23 +951,23 @@ void handleMenuOption(MenuOption option, node &head) {
             break;
         }
         case DISPLAY_ALL_INFORMATION:
-            cout << "5. Display all customer information\n";
+            cout << "\n5. Display all customer information\n";
             printInfo(head);
             break;
         case PRODUCT_CATALOG:
-            cout << "6. Product catalog\n";
+            cout << "\n6. Product catalog\n";
             readCategory();
             break;
         case UPDATE_INFORMATION:
-            cout << "7. Update customer information\n"; 
+            cout << "\n7. Update customer information\n"; 
             changeCustomer(head);
             break;
         case UPDATE_CATALOG:
-            cout << "8. Update catalog\n";
+            cout << "\n8. Update catalog\n";
             updateCategory();
             break;
         case ADD_NEW_PRODUCT:
-            cout << "9. Add new catalog\n";
+            cout << "\n9. Add new catalog\n";
             addNewProduct();
             break;
         case EXIT:
@@ -966,54 +976,101 @@ void handleMenuOption(MenuOption option, node &head) {
     }
 }
 
-/* Main function */
-int main() {
+/* Thread of main app */
+void* runApp(void* arg){
     node head = NULL;
     file.open("customerdata.txt", ios::out | ios::app);
     head = readCustomers();
     Menu menu;
     int x;
-    int line = 7;   // Starting position of the cursor
+    /* Starting position of the cursor */
+    int line = 10;  
     bool exitProgram = false;
 
-    // Display banner and menu
+    /* Display banner and menu */
     printBanner();
     menu.printMenu();
     gotoxy(0, line);
-    cout << (char)1;  // Draw the cursor pointing to the menu
+    /* Draw the cursor pointing to the menu */
+    cout << (char)1;
 
     while (!exitProgram) {
         if (kbhit()) {
             x = move();
             gotoxy(0, line);
-            cout << " ";  // Clear the cursor at the old position
 
             switch (x) {
                 case 1:
-                case 3:  // Move down
+                /* Move down */
+                case 3: 
                     line++;
-                    if (line >= menu.getNumberOfItems() + 7) line = 7;
+                    if (line >= menu.getNumberOfItems() + 10) line = 10;
                     break;
                 case 2:
-                case 4:  // Move up
+                /* Move up */
+                case 4: 
                     line--;
-                    if (line < 7) line = menu.getNumberOfItems() + 7 - 1;
+                    if (line < 10) line = menu.getNumberOfItems() + 10 - 1;
                     break;
-                case 5:  // Confirm menu selection
-                    handleMenuOption(static_cast<MenuOption>(line - 6), head);
+                /* Confirm menu selection */
+                case 5:
+                    handleMenuOption(static_cast<MenuOption>(line - 9), head);
                     system("read -p 'Press any key to continue...' var");
                     system("clear");
                     printBanner();
                     menu.printMenu();
                     break;
-                case 8:  // Exit the program
+                /* Exit the program */
+                case 8: 
                     exitProgram = true;
                     break;
             }
             gotoxy(0, line);
-            cout << (char)1;  // Draw the cursor at the new position
+            /* Draw the cursor at the new position */
+            cout << (char)1;
         }
     }
+    return 0;
+}
 
+/* Thread of clock */
+void* clockThread(void* arg) {
+    while (true) {
+        /* current position of pointer */
+        printf("\033[s"); 
+        /* move pointer to line 2, colum 25 */
+        printf("\033[2;25H");
+        /* get time */
+        time_t now = time(0);
+        tm* ltm = localtime(&now);
+        printf("| 🕒 %02d:%02d:%02d |", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
+        /* back to previous position of pointer */
+        printf("\033[u");  
+        fflush(stdout);
+        sleep(1);
+    }
+    return NULL;
+}
+
+
+/* Main function */
+int main() {
+    pthread_t clockT, appT;
+
+    /* Create thread of show clock  */
+    if (pthread_create(&clockT, NULL, clockThread, NULL) != 0) {
+        cerr << "[ERROR]: Unable create clock thread!\n" << endl;
+        return 1;
+    }
+
+    /* Create thread of main app */
+    if (pthread_create(&appT, NULL, runApp, NULL) != 0) { 
+        cerr << "[ERROR]: Unable create main app thread!\n" << endl;
+        return 1;
+    }
+
+    /* Wait and finish 2 threads */
+    pthread_join(clockT, NULL);
+    pthread_join(appT, NULL);
     return 0;
 }
