@@ -11,10 +11,52 @@
 #include <sstream>
 #include <algorithm>
 #include <set>
+#include <unordered_set>
+#include <regex>
 
 #include "mng_app.h"
 
 int countsdt = 0;
+
+// Check if the iPhone model name is valid
+bool isValidIphoneModel(const string& model) {
+    regex pattern(R"(iPhone (\d{2})( (Pro|Pro Max|Plus))?$)");
+    return regex_match(model, pattern);
+}
+
+// Retrieve the list of existing iPhones from the file
+unordered_set<string> getExistingIphonesWithStorage(const string& filename) {
+    unordered_set<string> existingIphones;
+    ifstream inFile(filename);
+    string line;
+
+    while (getline(inFile, line)) {
+        size_t pos = line.find(',');
+        if (pos != string::npos) {
+            existingIphones.insert(line.substr(0, line.find(',', pos + 1))); // Extract "Name,Storage"
+        }
+    }
+
+    inFile.close();
+    return existingIphones;
+}
+
+/* Function to check if string is all number */
+bool isValidNumber(const string& str) {
+    return !str.empty() && all_of(str.begin(), str.end(), ::isdigit);
+}
+
+
+/* Function to remove specical characters */
+string removeSpecialChars(string a) {
+    if (a.length() >= 2 && a[0] == '[') {  // 
+        if (a[1] == 'A' || a[1] == 'B' || a[1] == 'C' || a[1] == 'D') {
+            return a.substr(2);  // Remove "[ X"
+        }
+    }
+    if (a[0] == '\n') return a.substr(1);
+    return a;
+}
 
 /* Formating Name */
 std::string formatName(std::string& a) {
