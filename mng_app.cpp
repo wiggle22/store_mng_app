@@ -32,7 +32,7 @@ class Menu {
         const string* getItems() const { return items; }
     
     private:
-        static const int _numberOfItems = 10;
+        static const int _numberOfItems = 11;
         string items[_numberOfItems];
 };
  
@@ -47,7 +47,8 @@ Menu::Menu() {
     items[6] = "7. Update customer information";
     items[7] = "8. Update product catalog";
     items[8] = "9. Add new catalog";
-    items[9] = "10. Exit";
+    items[9] = "10. Back up data";
+    items[10] = "11. Exit";
 }
 
 /* Funtion to show customer list */
@@ -805,6 +806,42 @@ void addNewProduct() {
     cout << "\nUpdated Product Catalog:\n";
     readCategory(); // Display updated catalog
 }
+void backupData(node head) {
+    time_t now = time(0);
+    tm* ltm = localtime(&now);
+    stringstream ss;
+    ss << "backup_" << setfill('0') << setw(2) << ltm->tm_mday
+       << setw(2) << (ltm->tm_mon + 1) << (ltm->tm_year + 1900) << ".txt";
+
+    ofstream backupFile(ss.str());
+    if (!backupFile.is_open()) {
+        backupFile << "\n[Customer Data]\n";
+        cout << "[ERROR] Unable to create backup file." << endl;
+        return;
+    }
+
+    // Backup customer data
+    for (node temp = head; temp != NULL; temp = temp->next) {
+        backupFile << temp->cus.name << "," << temp->cus.age << ","
+                   << temp->cus.phonenumber << "," << temp->cus.item << ","
+                   << temp->cus.storage << "," << temp->cus.price << ","
+                   << temp->cus.trade_date << "," << temp->cus.warranty << endl;
+    }
+
+    // Backup category data
+    ifstream categoryFile("category.txt");
+    if (categoryFile.is_open()) {
+        backupFile << "\n[Category Data]\n";
+        string line;
+        while (getline(categoryFile, line)) {
+            backupFile << line << endl;
+        }
+        categoryFile.close();
+    }
+
+    backupFile.close();
+    cout << "Backup created successfully: " << ss.str() << endl;
+}
 
 /* MENU */
 void gotoxy(int column, int line) {
@@ -901,9 +938,10 @@ void Menu::clearMenu() {
 /* Function to display the banner title */
 void printBanner() {
     /* Draw border for clock */
-    cout << "\t \t \t.-------------.\n";
-    cout << "\t \t \t|    CLOCK    |\n";
-    cout << "\t \t \t'-------------'";
+    cout << "\t \t \t.---------------.\n";
+    cout << "\t \t \t|    CLOCK      |\n";
+    cout << "\t \t \t|    DAY TIME   |\n";
+    cout << "\t \t \t'---------------'";
     /* Draw app banner */
     cout << "\n\n=============================================================";
     cout << "\n \t-----------------------------------------------";
@@ -969,6 +1007,10 @@ void handleMenuOption(MenuOption option, node &head) {
         case ADD_NEW_PRODUCT:
             cout << "\n9. Add new catalog\n";
             addNewProduct();
+            break;
+        case BACKUP_DATA:
+            cout << "\n10. Back up data\n";
+            backupData(head);
             break;
         case EXIT:
             exitProgram();
@@ -1036,18 +1078,26 @@ void* runApp(void* arg){
 /* Thread of clock */
 void* clockThread(void* arg) {
     while (true) {
-        /* current position of pointer */
-        printf("\033[s"); 
-        /* move pointer to line 2, colum 25 */
-        printf("\033[2;25H");
-        /* get time */
+        /* Current Cursor Position */
+        printf("\033[s");           
+        // Move to line 2, column 25
+        printf("\033[2;25H");       
         time_t now = time(0);
         tm* ltm = localtime(&now);
-        printf("| 🕒 %02d:%02d:%02d |", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
-        /* back to previous position of pointer */
-        printf("\033[u");  
-        fflush(stdout);
-        sleep(1);
+        printf("| 🕒 %02d:%02d:%02d ",
+               ltm->tm_hour,        // Hours (0-23)
+               ltm->tm_min,         // Minutes (0-59)
+               ltm->tm_sec);        // Seconds (0-59)
+        
+        // MOve to line 3, column 25
+        printf("\033[3;25H");       
+        printf("| 📅 %02d/%02d/%04d ",
+               ltm->tm_mday,        // Days (1-31)
+               ltm->tm_mon + 1,     // Months (1-12)
+               ltm->tm_year + 1900); // Years since 1900 + 1900 = current year
+        printf("\033[u");           //  Back to previous position of pointer 
+        fflush(stdout);             
+        sleep(1);                   
     }
     return NULL;
 }
