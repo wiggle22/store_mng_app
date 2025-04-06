@@ -1030,6 +1030,9 @@ void* runApp(void* arg){
             cout << (char)1;
         }
     }
+    /* Close customerdata file */
+    file.close();
+
     return 0;
 }
 
