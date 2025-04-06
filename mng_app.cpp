@@ -759,9 +759,10 @@ void addNewProduct() {
             break;
         }
 
-        // Check valid
-        if (!isValidNumber(newProduct.storage) || newProduct.storage.empty()) {
-            cout << "[WARNING] Invalid storage capacity. Please enter a numeric value.\n";
+        if (newProduct.storage == "64" || newProduct.storage == "128" || newProduct.storage == "256" || newProduct.storage == "512" ) {
+            // do nothing
+        } else {
+            cout << "[WARNING] Invalid storage capacity.\n";
             attempts++;
             continue;
         }
