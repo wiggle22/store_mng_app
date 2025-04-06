@@ -916,7 +916,7 @@ int move() {
 /* Print Menu */
 void Menu::printMenu() {
     for (int i = 0; i < _numberOfItems; i++) {
-        gotoxy(3, 10 + i);
+        gotoxy(3, 11 + i);
         cout << items[i];
         /* Reduce delay for faster display */
         usleep(50000);
@@ -940,7 +940,7 @@ void printBanner() {
     /* Draw border for clock */
     cout << "\t \t \t.---------------.\n";
     cout << "\t \t \t|    CLOCK      |\n";
-    cout << "\t \t \t|    DAY TIME   |\n";
+    cout << "\t \t \t|   DAY TIME    |\n";
     cout << "\t \t \t'---------------'";
     /* Draw app banner */
     cout << "\n\n=============================================================";
@@ -960,7 +960,7 @@ void exitProgram() {
 
 /* Function to handle menu options */
 void handleMenuOption(MenuOption option, node &head) {
-    gotoxy(0, 21);
+    gotoxy(0, 22);
     switch (option) {
         case ENTER_INFORMATION:
             cout << "\n1. Enter custormer information\n";
@@ -1026,7 +1026,7 @@ void* runApp(void* arg){
     Menu menu;
     int x;
     /* Starting position of the cursor */
-    int line = 10;  
+    int line = 11;  
     bool exitProgram = false;
 
     /* Display banner and menu */
@@ -1046,17 +1046,17 @@ void* runApp(void* arg){
                 /* Move down */
                 case 3: 
                     line++;
-                    if (line >= menu.getNumberOfItems() + 10) line = 10;
+                    if (line >= menu.getNumberOfItems() + 11) line = 11;
                     break;
                 case 2:
                 /* Move up */
                 case 4: 
                     line--;
-                    if (line < 10) line = menu.getNumberOfItems() + 10 - 1;
+                    if (line < 11) line = menu.getNumberOfItems() + 11 - 1;
                     break;
                 /* Confirm menu selection */
                 case 5:
-                    handleMenuOption(static_cast<MenuOption>(line - 9), head);
+                    handleMenuOption(static_cast<MenuOption>(line - 10), head);
                     system("read -p 'Press any key to continue...' var");
                     system("clear");
                     printBanner();
@@ -1112,7 +1112,6 @@ int main() {
         cerr << "[ERROR]: Unable create clock thread!\n" << endl;
         return 1;
     }
-
     /* Create thread of main app */
     if (pthread_create(&appT, NULL, runApp, NULL) != 0) { 
         cerr << "[ERROR]: Unable create main app thread!\n" << endl;
