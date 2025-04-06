@@ -18,6 +18,15 @@
 
 int countsdt = 0;
 
+/* Function to check option */
+bool askYesNo(const string &message) {
+    string selection;
+    cout << message << " (yes/no)? ";
+    cin >> selection;
+    transform(selection.begin(), selection.end(), selection.begin(), ::tolower);
+    return (selection == "yes");
+}
+
 // Check if the iPhone model name is valid
 bool isValidIphoneModel(const string& model) {
     regex pattern(R"(iPhone (\d{2})( (Pro|Pro Max|Plus))?$)");

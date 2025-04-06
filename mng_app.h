@@ -63,5 +63,6 @@ string removeSpecialChars(string a);
 bool isValidNumber(const string& str);
 bool isValidIphoneModel(const string& model);
 unordered_set<string> getExistingIphonesWithStorage(const string& filename);
+bool askYesNo(const string &message);
 
 #endif
