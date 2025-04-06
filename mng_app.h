@@ -44,6 +44,7 @@ enum MenuOption {
     UPDATE_INFORMATION,
     UPDATE_CATALOG,
     ADD_NEW_PRODUCT,
+    BACKUP_DATA,
     EXIT
 };
 
