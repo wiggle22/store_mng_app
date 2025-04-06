@@ -815,19 +815,19 @@ void backupData(node head) {
 
     ofstream backupFile(ss.str());
     if (!backupFile.is_open()) {
-        backupFile << "\n[Customer Data]\n";
         cout << "[ERROR] Unable to create backup file." << endl;
         return;
     }
-
     // Backup customer data
-    for (node temp = head; temp != NULL; temp = temp->next) {
-        backupFile << temp->cus.name << "," << temp->cus.age << ","
-                   << temp->cus.phonenumber << "," << temp->cus.item << ","
-                   << temp->cus.storage << "," << temp->cus.price << ","
-                   << temp->cus.trade_date << "," << temp->cus.warranty << endl;
+    ifstream customerdataFile("customerdata.txt");
+    if (customerdataFile.is_open()) {
+        backupFile << "[Customer Data]\n";
+        string line;
+        while (getline(customerdataFile, line)) {
+            backupFile << line << endl;
+        }
+        customerdataFile.close();
     }
-
     // Backup category data
     ifstream categoryFile("category.txt");
     if (categoryFile.is_open()) {
