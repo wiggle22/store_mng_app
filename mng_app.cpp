@@ -33,7 +33,7 @@ class Menu {
         const string* getItems() const { return items; }
     
     private:
-        static const int _numberOfItems = 10;
+        static const int _numberOfItems = 11;
         string items[_numberOfItems];
 };
  
@@ -48,7 +48,8 @@ Menu::Menu() {
     items[6] = "7. Update customer information";
     items[7] = "8. Update product catalog";
     items[8] = "9. Add new catalog";
-    items[9] = "10. Exit";
+    items[9] = "10. Back up data";
+    items[10] = "11. Exit";
 }
 
 /* Funtion to show customer list */
@@ -856,6 +857,42 @@ void addNewProduct() {
     cout << "\nUpdated Product Catalog:\n";
     readCategory(); // Display updated catalog
 }
+void backupData(node head) {
+    time_t now = time(0);
+    tm* ltm = localtime(&now);
+    stringstream ss;
+    ss << "backup_" << setfill('0') << setw(2) << ltm->tm_mday
+       << setw(2) << (ltm->tm_mon + 1) << (ltm->tm_year + 1900) << ".txt";
+
+    ofstream backupFile(ss.str());
+    if (!backupFile.is_open()) {
+        cout << "[ERROR] Unable to create backup file." << endl;
+        return;
+    }
+    // Backup customer data
+    ifstream customerdataFile("customerdata.txt");
+    if (customerdataFile.is_open()) {
+        backupFile << "[Customer Data]\n";
+        string line;
+        while (getline(customerdataFile, line)) {
+            backupFile << line << endl;
+        }
+        customerdataFile.close();
+    }
+    // Backup category data
+    ifstream categoryFile("category.txt");
+    if (categoryFile.is_open()) {
+        backupFile << "\n[Category Data]\n";
+        string line;
+        while (getline(categoryFile, line)) {
+            backupFile << line << endl;
+        }
+        categoryFile.close();
+    }
+
+    backupFile.close();
+    cout << "Backup created successfully: " << ss.str() << endl;
+}
 
 /* MENU */
 void gotoxy(int column, int line) {
@@ -930,7 +967,7 @@ int move() {
 /* Print Menu */
 void Menu::printMenu() {
     for (int i = 0; i < _numberOfItems; i++) {
-        gotoxy(3, 10 + i);
+        gotoxy(3, 11 + i);
         cout << items[i];
         /* Reduce delay for faster display */
         usleep(50000);
@@ -952,9 +989,10 @@ void Menu::clearMenu() {
 /* Function to display the banner title */
 void printBanner() {
     /* Draw border for clock */
-    cout << "\t \t \t.-------------.\n";
-    cout << "\t \t \t|    CLOCK    |\n";
-    cout << "\t \t \t'-------------'";
+    cout << "\t \t \t.---------------.\n";
+    cout << "\t \t \t|    CLOCK      |\n";
+    cout << "\t \t \t|   DAY TIME    |\n";
+    cout << "\t \t \t'---------------'";
     /* Draw app banner */
     cout << "\n\n=============================================================";
     cout << "\n \t-----------------------------------------------";
@@ -973,7 +1011,7 @@ void exitProgram() {
 
 /* Function to handle menu options */
 void handleMenuOption(MenuOption option, node &head) {
-    gotoxy(0, 20);
+    gotoxy(0, 22);
     switch (option) {
         case ENTER_INFORMATION:
             cout << "\n1. Enter custormer information\n";
@@ -1021,6 +1059,10 @@ void handleMenuOption(MenuOption option, node &head) {
             cout << "\n9. Add new catalog\n";
             addNewProduct();
             break;
+        case BACKUP_DATA:
+            cout << "\n10. Back up data\n";
+            backupData(head);
+            break;
         case EXIT:
             exitProgram();
             break;
@@ -1035,7 +1077,7 @@ void* runApp(void* arg){
     Menu menu;
     int x;
     /* Starting position of the cursor */
-    int line = 10;  
+    int line = 11;  
     bool exitProgram = false;
 
     /* Display banner and menu */
@@ -1055,17 +1097,17 @@ void* runApp(void* arg){
                 /* Move down */
                 case 3: 
                     line++;
-                    if (line >= menu.getNumberOfItems() + 10) line = 10;
+                    if (line >= menu.getNumberOfItems() + 11) line = 11;
                     break;
                 case 2:
                 /* Move up */
                 case 4: 
                     line--;
-                    if (line < 10) line = menu.getNumberOfItems() + 10 - 1;
+                    if (line < 11) line = menu.getNumberOfItems() + 11 - 1;
                     break;
                 /* Confirm menu selection */
                 case 5:
-                    handleMenuOption(static_cast<MenuOption>(line - 9), head);
+                    handleMenuOption(static_cast<MenuOption>(line - 10), head);
                     system("read -p 'Press any key to continue...' var");
                     system("clear");
                     printBanner();
@@ -1081,24 +1123,35 @@ void* runApp(void* arg){
             cout << (char)1;
         }
     }
+    /* Close customerdata file */
+    file.close();
+
     return 0;
 }
 
 /* Thread of clock */
 void* clockThread(void* arg) {
     while (true) {
-        /* current position of pointer */
-        printf("\033[s"); 
-        /* move pointer to line 2, colum 25 */
-        printf("\033[2;25H");
-        /* get time */
+        /* Current Cursor Position */
+        printf("\033[s");           
+        // Move to line 2, column 25
+        printf("\033[2;25H");       
         time_t now = time(0);
         tm* ltm = localtime(&now);
-        printf("| 🕒 %02d:%02d:%02d |", ltm->tm_hour, ltm->tm_min, ltm->tm_sec);
-        /* back to previous position of pointer */
-        printf("\033[u");  
-        fflush(stdout);
-        sleep(1);
+        printf("| 🕒 %02d:%02d:%02d ",
+               ltm->tm_hour,        // Hours (0-23)
+               ltm->tm_min,         // Minutes (0-59)
+               ltm->tm_sec);        // Seconds (0-59)
+        
+        // MOve to line 3, column 25
+        printf("\033[3;25H");       
+        printf("| 📅 %02d/%02d/%04d ",
+               ltm->tm_mday,        // Days (1-31)
+               ltm->tm_mon + 1,     // Months (1-12)
+               ltm->tm_year + 1900); // Years since 1900 + 1900 = current year
+        printf("\033[u");           //  Back to previous position of pointer 
+        fflush(stdout);             
+        sleep(1);                   
     }
     return NULL;
 }
@@ -1113,7 +1166,6 @@ int main() {
         cerr << "[ERROR]: Unable create clock thread!\n" << endl;
         return 1;
     }
-
     /* Create thread of main app */
     if (pthread_create(&appT, NULL, runApp, NULL) != 0) { 
         cerr << "[ERROR]: Unable create main app thread!\n" << endl;
