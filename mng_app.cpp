@@ -11,6 +11,7 @@
 #include <sstream>
 #include <algorithm>
 #include <set>
+#include <unordered_set>
 #include <limits>
 #include <pthread.h>
 
@@ -124,16 +125,6 @@ void readCategory() {
     }
 }
 
-/* Function to remove specical characters */
-std::string removeSpecialChars(std::string a) {
-    if (a.length() >= 2 && a[0] == '[') {  // 
-        if (a[1] == 'A' || a[1] == 'B' || a[1] == 'C' || a[1] == 'D') {
-            return a.substr(2);  // Remove "[ X"
-        }
-    }
-    if (a[0] == '\n') return a.substr(1);
-    return a;
-}
 
 /* Function to add info new customer */
 node makeNode() {
@@ -331,7 +322,8 @@ void deleteCustomer(node &a) {
     Customer check;
     string phoneNumber, choice;
     cout << "=> Customer phone number: ";
-    cin >> phoneNumber;
+    getline(cin.ignore(), phoneNumber);
+    phoneNumber = removeSpecialChars(phoneNumber);
 
     node current = a;
     node previous = NULL;
@@ -733,59 +725,118 @@ void updateCategory() {
 
 void addNewProduct() {
     Category newProduct;
-    // Input product name
-    cout << "=> Product name: ";
+    unordered_set<string> existingProducts = getExistingIphonesWithStorage("category.txt");
+
     cin.ignore();
-    getline(cin, newProduct.namepro);
-    newProduct.namepro = removeSpecialChars(newProduct.namepro);
-    newProduct.namepro = formatName(newProduct.namepro);
-    if (newProduct.namepro.empty()) {
-        cout << "[WARNING] Product name cannot be empty.\n";
+    // Input product name
+    while (true) {
+        cout << "=> Product name: ";
+        getline(cin, newProduct.namepro);
+
+        newProduct.namepro = removeSpecialChars(newProduct.namepro);
+        newProduct.namepro = formatName(newProduct.namepro);
+
+        if (newProduct.namepro.empty()) {
+            cout << "[WARNING] Product name cannot be empty.\n";
+            continue;
+        }
+
+        if (!isValidIphoneModel(newProduct.namepro)) {
+            cout << "[WARNING] Invalid product name. Please enter a valid iPhone model.\n";
+            continue;
+        }
+
+        break;
+    }
+
+    // Input storage capacity 
+    int attempts = 0;
+    while (attempts < 5) {
+        cout << "=> Storage capacity (e.g., 64/128/256/512 or 1TB): ";
+        cin >> newProduct.storage;
+        newProduct.storage = removeSpecialChars(newProduct.storage);
+
+        if (newProduct.storage == "1TB") {
+            break;
+        }
+
+        if (newProduct.storage == "64" || newProduct.storage == "128" || newProduct.storage == "256" || newProduct.storage == "512" ) {
+            // do nothing
+        } else {
+            cout << "[WARNING] Invalid storage capacity.\n";
+            attempts++;
+            continue;
+        }
+        
+        newProduct.storage = newProduct.storage + "GB";
+        break;
+    }
+
+    if (attempts == 5) {
+        cout << "[ERROR] Too many invalid attempts. Returning to menu.\n";
         return;
     }
 
-    // Input storage capacity
-    cout << "=> Storage capacity: ";
-    cin >> newProduct.storage;
-    newProduct.storage = removeSpecialChars(newProduct.storage);
-    if (newProduct.storage.empty()) {
-        cout << "[WARNING] Storage capacity cannot be empty.\n";
+    // Check if the iPhone model with this storage already exists
+    string productKey = newProduct.namepro + "," + newProduct.storage;
+    if (existingProducts.find(productKey) != existingProducts.end()) {
+        cout << "[WARNING] This iPhone model with the specified storage already exists. Please enter a different product.\n";
         return;
     }
 
     // Input price
-    cout << "=> New price (e.g., 36,000,000):  ";
-    cin >> newProduct.price;     
-    newProduct.price = newProduct.price + " VND";
-    if (newProduct.price.empty()) {
-        cout << "[WARNING] Invalid price. Please enter a numeric value.\n";
+    attempts = 0;
+    while(attempts < 5){
+        cout << "=> New price (e.g., 36000000): ";
+        cin >> newProduct.price;
+
+        if (!isValidNumber(newProduct.price) || (newProduct.price).empty()) {
+            cout << "[WARNING] Invalid price. Please enter a numeric value.\n";
+            attempts++;
+            continue;
+        }
+
+        newProduct.price += " VND";  // Thêm đơn vị tiền tệ
+        break;
+    }
+
+    if (attempts == 5) {
+        cout << "[ERROR] Too many invalid attempts. Returning to menu.\n";
         return;
     }
 
     // Input warranty
-    cout << "=> Warranty period (in years, e.g., 2): ";
-    cin >> newProduct.warranty;
-    // Validate warranty input
-    bool validWarranty = true;
-    for (char ch : newProduct.warranty) {
-        if (!isdigit(ch)) {
-            validWarranty = false;
+    attempts = 0;
+    while(attempts < 5){
+        cout << "=> Warranty period (in years, e.g., 2): ";
+        cin >> newProduct.warranty;
+        // Validate warranty input
+        if (!isValidNumber(newProduct.warranty) || (newProduct.warranty.empty())) {
+            cout << "[WARNING] Invalid warranty period. Please enter a numeric value.\n";
+            attempts++;
+            continue;
+        }
+        try {
+            long long years = stoll(newProduct.warranty); // Chuyển sang số nguyên lớn hơn
+    
+            if (years >= 2) {
+                newProduct.warranty += " years";
+            } else {
+                newProduct.warranty += " year";
+            }
             break;
+    
+        } catch (const out_of_range&) {
+            cout << "[WARNING] Warranty period is too large. Please enter a reasonable number.\n";
+            attempts++;
         }
     }
-    
 
-    if (!validWarranty || newProduct.warranty.empty()) {
-        cout << "[WARNING] Invalid warranty period. Please enter a positive integer.\n";
+    if (attempts == 5) {
+        cout << "[ERROR] Too many invalid attempts. Returning to menu.\n";
         return;
     }
-
-    int years = stoi(newProduct.warranty); // Convert string to integer
-    if (years >= 2) {
-        newProduct.warranty = newProduct.warranty + " years";
-    } else {
-        newProduct.warranty = newProduct.warranty + " year";
-    }
+    
 
     // Open file in append mode
     ofstream outFile("category.txt", ios::app);

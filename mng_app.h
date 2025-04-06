@@ -15,6 +15,8 @@
 #include <algorithm>
 #include <set>
 #include <limits>
+#include <unordered_set>
+#include <regex>
 
 using namespace std;
 
@@ -57,5 +59,9 @@ bool isValidPhoneNumber(const string &a);
 string formatDate(string &a);
 string formatAge(string &a);
 string formatPrice(string a);
+string removeSpecialChars(string a);
+bool isValidNumber(const string& str);
+bool isValidIphoneModel(const string& model);
+unordered_set<string> getExistingIphonesWithStorage(const string& filename);
 
 #endif
