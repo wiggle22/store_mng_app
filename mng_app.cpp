@@ -131,8 +131,7 @@ node makeNode() {
     Customer cus;
     // Input and format customer name
     cout << "=> Customer name: ";
-    getline(cin.ignore(), cus.name);
-    cus.name = removeSpecialChars(cus.name);
+    getline(cin, cus.name);
     cus.name = formatName(cus.name);
 
     // Input and format customer age
@@ -152,7 +151,6 @@ node makeNode() {
     while (!found) {
         cout << "=> Product item: ";
         getline(cin, cus.item);
-        cus.item = removeSpecialChars(cus.item);
         cus.item = formatName(cus.item);
 
         ifstream myfile("category.txt");
@@ -188,7 +186,6 @@ node makeNode() {
     while (!found) {
         cout << "=> Phone storage capacity: ";
         cin >> cus.storage;
-        cus.storage = removeSpecialChars(cus.storage);
 
         ifstream myfile("category.txt");
         string line;
@@ -323,7 +320,6 @@ void deleteCustomer(node &a) {
     string phoneNumber, choice;
     cout << "=> Customer phone number: ";
     getline(cin.ignore(), phoneNumber);
-    phoneNumber = removeSpecialChars(phoneNumber);
 
     node current = a;
     node previous = NULL;
@@ -553,8 +549,7 @@ void changeCustomer(node &a) {
     bool found = false;
 
     cout << "=> Customer phone number: ";
-    getline(cin.ignore(), phoneNumber);
-    phoneNumber = removeSpecialChars(phoneNumber);
+    getline(cin, phoneNumber);
 
     while (!found) {
         for (node i = a; i != NULL; i = i->next) {
@@ -637,14 +632,11 @@ void updateCategory() {
     // Get product to update
     string productName, storage;
     cout << "\nEnter product name to update (exact match): ";
-    getline(cin.ignore(), productName);
-    productName = removeSpecialChars(productName);
+    getline(cin, productName);
     productName = formatName(productName);
 
     cout << "Enter storage capacity to update (exact match): ";
     getline(cin, storage);
-   
-    storage = removeSpecialChars(storage);
 
     // Find and update the item
     for (int i = 0; i < count; i++) {
@@ -727,13 +719,10 @@ void addNewProduct() {
     Category newProduct;
     unordered_set<string> existingProducts = getExistingIphonesWithStorage("category.txt");
 
-    cin.ignore();
     // Input product name
     while (true) {
         cout << "=> Product name: ";
         getline(cin, newProduct.namepro);
-
-        newProduct.namepro = removeSpecialChars(newProduct.namepro);
         newProduct.namepro = formatName(newProduct.namepro);
 
         if (newProduct.namepro.empty()) {
@@ -754,7 +743,6 @@ void addNewProduct() {
     while (attempts < 5) {
         cout << "=> Storage capacity (e.g., 64/128/256/512 or 1TB): ";
         cin >> newProduct.storage;
-        newProduct.storage = removeSpecialChars(newProduct.storage);
 
         if (newProduct.storage == "1TB") {
             break;
@@ -927,41 +915,41 @@ int kbhit() {
 }
 
 /* getch() in Linux */
-char getch() {
-    char buf = 0;
-    struct termios old = {0};
-    fflush(stdout);
-    if (tcgetattr(0, &old) < 0) perror("tcsetattr()");
-    old.c_lflag &= ~ICANON;
-    old.c_lflag &= ~ECHO;
-    old.c_cc[VMIN] = 1;
-    old.c_cc[VTIME] = 0;
-    if (tcsetattr(0, TCSANOW, &old) < 0) perror("tcsetattr ICANON");
-    if (read(0, &buf, 1) < 0) perror("read()");
-    old.c_lflag |= ICANON;
-    old.c_lflag |= ECHO;
-    if (tcsetattr(0, TCSADRAIN, &old) < 0) perror("tcsetattr ~ICANON");
-    return buf;
+int getch() {
+    struct termios oldt, newt;
+    int ch;
+    tcgetattr(STDIN_FILENO, &oldt);        // save old settings
+    newt = oldt;
+    newt.c_lflag &= ~(ICANON | ECHO);      // disable buffering and echo
+    tcsetattr(STDIN_FILENO, TCSANOW, &newt);
+    ch = getchar();
+    tcsetattr(STDIN_FILENO, TCSANOW, &oldt); // restore settings
+    return ch;
 }
 
 /* Function to move pointer */
 int move() {
-    char c = getch();
-    if (c == 27) { // ESC key
+    int c = getch();
+    
+    if (c == 27) { // ESC key (ASCII code)
         if (kbhit()) {
-            getch(); // Discard the '[' character
-            switch (getch()) {
-                case 'A': return 2; // Up
-                case 'B': return 1; // Down
-                case 'C': return 3; // Right
-                case 'D': return 4; // Left
+            int second = getch();
+            if (second == '[') {
+                int third = getch();
+                switch (third) {
+                    case 'A': return 2; // Up
+                    case 'B': return 1; // Down
+                    case 'C': return 3; // Right
+                    case 'D': return 4; // Left
+                }
             }
         }
-        return 8; // ESC
-    } else if (c == 10) {
-        return 5; // Enter
+        return 8; // ESC key
+    } else if (c == '\n' || c == 10 || c == 13) {
+        return 5; // Enter key
     }
-    return 0;
+
+    return 0; 
 }
 
 /* Print Menu */
@@ -1031,8 +1019,7 @@ void handleMenuOption(MenuOption option, node &head) {
             cout << "a. Search by customer phone number\n";
             cout << "b. Search by product\n";
             cout << "=> Please choose: ";
-            getline(cin.ignore(), choice);
-            choice = removeSpecialChars(choice);
+            getline(cin, choice);
             if (choice == "a")
                 printOneInfo(head);
             else if (choice == "b")
@@ -1067,6 +1054,17 @@ void handleMenuOption(MenuOption option, node &head) {
             exitProgram();
             break;
     }
+}
+
+/* function to clear screen */
+void clearScreen() {
+    cout << "\033[2J\033[1;1H";  // ANSI escape code to clear screen and move cursor
+}
+
+/* function to countinue by pressing any key */
+void pressAnyKey() {
+    cout << "Press any key to continue...";
+    getch(); // từ hàm ở trên
 }
 
 /* Thread of main app */
@@ -1108,8 +1106,8 @@ void* runApp(void* arg){
                 /* Confirm menu selection */
                 case 5:
                     handleMenuOption(static_cast<MenuOption>(line - 10), head);
-                    system("read -p 'Press any key to continue...' var");
-                    system("clear");
+                    pressAnyKey();
+                    clearScreen();
                     printBanner();
                     menu.printMenu();
                     break;
