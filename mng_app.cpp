@@ -130,23 +130,10 @@ void readCategory() {
 node makeNode() {
     Customer cus;
     // Input and format customer name
-    while (true) {
-        cout << "=> Customer name: ";
-        getline(cin.ignore(), cus.name);
-        cus.name = removeSpecialChars(cus.name);
-        cus.name = formatName(cus.name);
-
-        if(cus.name.empty()){
-            cout << "[WARNING] Customer name cannot be empty.\n";
-            if(!askYesNo("Do you want to try again?")) {
-                return nullptr;
-            }
-            continue;
-        }
-        break;
-    }
-    
-    
+    cout << "=> Customer name: ";
+    getline(cin.ignore(), cus.name);
+    cus.name = removeSpecialChars(cus.name);
+    cus.name = formatName(cus.name);
 
     // Input and format customer age
     cout << "=> Customer age: ";
@@ -163,23 +150,10 @@ node makeNode() {
     // Input and validate product item
     bool found = false;
     while (!found) {
-        while (true) {
-            cout << "=> Product item: ";
-            getline(cin, cus.item);
-            cus.item = removeSpecialChars(cus.item);
-            cus.item = formatName(cus.item);
-
-            if(cus.item.empty()){
-                cout << "[WARNING] Product item cannot be empty.\n";
-                if(!askYesNo("Do you want to try again?")) {
-                    return nullptr;
-                }
-                continue;
-            }
-            break;
-        }
-        
-        
+        cout << "=> Product item: ";
+        getline(cin, cus.item);
+        cus.item = removeSpecialChars(cus.item);
+        cus.item = formatName(cus.item);
 
         ifstream myfile("category.txt");
         string line;
@@ -317,10 +291,6 @@ void sortList(node head) {
 /* Function to add customer */
 void insertCustomer(node &a) {
     node tmp = makeNode();
-    if (tmp == nullptr) {
-        cout << "Customer input cancelled.\n";
-        return;
-    }
     tmp->next = a;
     a = tmp;
     sortList(a);  // Sort the list after insertion
@@ -562,6 +532,15 @@ void updateFile(node &a) {
     }
 }
 
+/* Function to check option */
+bool askYesNo(const string &message) {
+    string selection;
+    cout << message << " (yes/no)? ";
+    cin >> selection;
+    transform(selection.begin(), selection.end(), selection.begin(), ::tolower);
+    return (selection == "yes");
+}
+
 /* Function to change info of customer */
 void changeCustomer(node &a) {
     if (isEmpty(a)) {
@@ -586,21 +565,9 @@ void changeCustomer(node &a) {
 
                 // Update customer information
                 if (askYesNo("Do you want to change the name")) {
-                    while (true) {
-                        cout << "New name: ";
-                        getline(cin.ignore(), check.name);
-                        check.name = formatName(check.name);
-
-                        if (check.name.empty()){
-                            cout << "[WARNING] Customer name cannot be empty.\n";
-                            if(!askYesNo("Do you want to try again?")) {
-                                return;
-                            }
-                            continue; 
-                        }
-                        break;
-                    }
-                    
+                    cout << "New name: ";
+                    getline(cin.ignore(), check.name);
+                    check.name = formatName(check.name);
                 }
 
                 if (askYesNo("Do you want to change the age")) {
@@ -669,36 +636,15 @@ void updateCategory() {
 
     // Get product to update
     string productName, storage;
-    while (true) {
-        cout << "\nEnter product name to update (exact match): ";
-        getline(cin.ignore(), productName);
-        productName = removeSpecialChars(productName);
-        productName = formatName(productName);
+    cout << "\nEnter product name to update (exact match): ";
+    getline(cin.ignore(), productName);
+    productName = removeSpecialChars(productName);
+    productName = formatName(productName);
 
-        if(productName.empty()){
-            cout << "[WARNING] Product name cannot be empty.\n";
-            if(!askYesNo("Do you want to try again?")) {
-                return;
-            }
-            continue;
-        }
-        break;
-    }
-    
-    while (true) {
-        cout << "Enter storage capacity to update (exact match): ";
-        getline(cin, storage);
-        storage = removeSpecialChars(storage);
-
-        if (storage.empty()){
-            cout << "[WARNING] Storage capacity cannot be empty.\n";
-            if(!askYesNo("Do you want to try again?")) {
-                return;
-            }
-            continue;
-        }
-        break;
-    }
+    cout << "Enter storage capacity to update (exact match): ";
+    getline(cin, storage);
+   
+    storage = removeSpecialChars(storage);
 
     // Find and update the item
     for (int i = 0; i < count; i++) {
@@ -1082,22 +1028,11 @@ void handleMenuOption(MenuOption option, node &head) {
         case SEARCH_INFORMATION: {
             cout << "\n4. Search customer information\n";
             string choice;
-            while (true) {
-                cout << "a. Search by customer phone number\n";
-                cout << "b. Search by product\n";
-                cout << "=> Please choose: ";
-                getline(cin.ignore(), choice);
-                choice = removeSpecialChars(choice);
-
-                if (choice.empty() || choice != "a" || choice != "b") {
-                    cout << "[WARNING] Please enter a or b.\n";
-                    if(!askYesNo("Do you want to try again?")) {
-                        return;
-                    }
-                    continue;
-                }
-                break;
-            }
+            cout << "a. Search by customer phone number\n";
+            cout << "b. Search by product\n";
+            cout << "=> Please choose: ";
+            getline(cin.ignore(), choice);
+            choice = removeSpecialChars(choice);
             if (choice == "a")
                 printOneInfo(head);
             else if (choice == "b")
