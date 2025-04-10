@@ -962,6 +962,17 @@ void Menu::printMenu() {
     }
     cout << "\n=============================================================";
 }
+
+/* function to clear screen */
+void clearScreen() {
+    cout << "\033[2J\033[1;1H";  // ANSI escape code to clear screen and move cursor
+}
+
+/* function to countinue by pressing any key */
+void pressAnyKey() {
+    cout << "Press any key to continue...";
+    getch(); // từ hàm ở trên
+}
  
 /* Clear Menu */
 void Menu::clearMenu() {
@@ -990,7 +1001,7 @@ void printBanner() {
 
 /* Function to exit the program */
 void exitProgram() {
-    system("clear");
+    clearScreen();
     cout << "\n******* Have a great day *******\n" << endl;
     cout << "************ See you again *************\n" << endl;
     file.close();
@@ -1056,17 +1067,6 @@ void handleMenuOption(MenuOption option, node &head) {
     }
 }
 
-/* function to clear screen */
-void clearScreen() {
-    cout << "\033[2J\033[1;1H";  // ANSI escape code to clear screen and move cursor
-}
-
-/* function to countinue by pressing any key */
-void pressAnyKey() {
-    cout << "Press any key to continue...";
-    getch(); // từ hàm ở trên
-}
-
 /* Thread of main app */
 void* runApp(void* arg){
     node head = NULL;
@@ -1076,7 +1076,6 @@ void* runApp(void* arg){
     int x;
     /* Starting position of the cursor */
     int line = 11;  
-    bool exitProgram = false;
 
     /* Display banner and menu */
     printBanner();
@@ -1085,7 +1084,7 @@ void* runApp(void* arg){
     /* Draw the cursor pointing to the menu */
     cout << (char)1;
 
-    while (!exitProgram) {
+    while (true) {
         if (kbhit()) {
             x = move();
             gotoxy(0, line);
@@ -1113,7 +1112,7 @@ void* runApp(void* arg){
                     break;
                 /* Exit the program */
                 case 8: 
-                    exitProgram = true;
+                    exitProgram();
                     break;
             }
             gotoxy(0, line);
