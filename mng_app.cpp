@@ -27,7 +27,7 @@ class Menu {
         Menu();
         ~Menu() {}
     
-        void printMenu();
+        void printMenu(int line);
         void clearMenu();
         int getNumberOfItems() const { return _numberOfItems; }
         const string* getItems() const { return items; }
@@ -237,6 +237,9 @@ node makeNode() {
         cout << "[ERROR] Unable to open file customerdata.txt" << endl;
     }
 
+    cout << "Customer data updated successfully! Back to menu in 2 seconds\n";
+    sleep(2);
+
     return tmp;
 }
 
@@ -319,7 +322,8 @@ void deleteCustomer(node &a) {
     Customer check;
     string phoneNumber, choice;
     cout << "=> Customer phone number: ";
-    getline(cin.ignore(), phoneNumber);
+    getline(cin, phoneNumber);
+    phoneNumber = formatPhoneNumber(phoneNumber);
 
     node current = a;
     node previous = NULL;
@@ -483,7 +487,8 @@ void printOneInfo(node &a) {
     bool found = false;
 
     cout << "=> Customer phone number: ";
-    cin >> phoneNumber;
+    getline(cin, phoneNumber);
+    phoneNumber = formatPhoneNumber(phoneNumber);
 
     while (!found) {
         for (node i = a; i != NULL; i = i->next) {
@@ -597,6 +602,9 @@ void changeCustomer(node &a) {
             }
         }
     }
+
+    cout << "Update customer data successfully! Back to menu in 2 seconds.";
+    sleep(2);
 }
 
 /* Function to update items in category.txt */
@@ -713,6 +721,7 @@ void updateCategory() {
     cout << "Category file updated successfully.\n";
     cout << "\nUpdated Product Catalog:\n";
     readCategory();
+    sleep(2);
 }
 
 void addNewProduct() {
@@ -844,7 +853,9 @@ void addNewProduct() {
     cout << "New product added successfully.\n";
     cout << "\nUpdated Product Catalog:\n";
     readCategory(); // Display updated catalog
+    sleep(2);
 }
+
 void backupData(node head) {
     time_t now = time(0);
     tm* ltm = localtime(&now);
@@ -953,14 +964,17 @@ int move() {
 }
 
 /* Print Menu */
-void Menu::printMenu() {
-    for (int i = 0; i < _numberOfItems; i++) {
-        gotoxy(3, 11 + i);
-        cout << items[i];
-        /* Reduce delay for faster display */
-        usleep(50000);
+void Menu::printMenu(int line) {
+    for (int i = 11; i < _numberOfItems+11; i++) {
+        gotoxy(2, i);
+        if (i == line) {
+            cout << " > \033[1;32m" << items[i-11] << "\033[0m"; // green line
+        }  else {
+            cout << "   " << items[i-11];
+        }
     }
     cout << "\n=============================================================";
+    gotoxy(2, line);
 }
 
 /* function to clear screen */
@@ -971,7 +985,7 @@ void clearScreen() {
 /* function to countinue by pressing any key */
 void pressAnyKey() {
     cout << "Press any key to continue...";
-    getch(); // từ hàm ở trên
+    getch();
 }
  
 /* Clear Menu */
@@ -1079,46 +1093,46 @@ void* runApp(void* arg){
 
     /* Display banner and menu */
     printBanner();
-    menu.printMenu();
-    gotoxy(0, line);
-    /* Draw the cursor pointing to the menu */
-    cout << (char)1;
+    
+    // gotoxy(0, line);
+    // /* Draw the cursor pointing to the menu */
+    // cout << (char)1;
 
     while (true) {
-        if (kbhit()) {
-            x = move();
-            gotoxy(0, line);
+        menu.printMenu(line);
+        x = move();
 
-            switch (x) {
-                case 1:
-                /* Move down */
-                case 3: 
-                    line++;
-                    if (line >= menu.getNumberOfItems() + 11) line = 11;
-                    break;
-                case 2:
-                /* Move up */
-                case 4: 
-                    line--;
-                    if (line < 11) line = menu.getNumberOfItems() + 11 - 1;
-                    break;
-                /* Confirm menu selection */
-                case 5:
-                    handleMenuOption(static_cast<MenuOption>(line - 10), head);
-                    pressAnyKey();
-                    clearScreen();
-                    printBanner();
-                    menu.printMenu();
-                    break;
-                /* Exit the program */
-                case 8: 
-                    exitProgram();
-                    break;
-            }
-            gotoxy(0, line);
-            /* Draw the cursor at the new position */
-            cout << (char)1;
+        switch (x) {
+            case 1:
+            /* Move down */
+            case 3: 
+                line++;
+                if (line >= menu.getNumberOfItems() + 11) line = 11;
+                break;
+            case 2:
+            /* Move up */
+            case 4: 
+                line--;
+                if (line < 11) line = menu.getNumberOfItems() + 11 - 1;
+                break;
+            /* Confirm menu selection */
+            case 5:
+                handleMenuOption(static_cast<MenuOption>(line - 10), head);
+                while (kbhit()) {
+                    pressAnyKey();  
+                }
+                clearScreen();
+                printBanner();
+                menu.printMenu(line);
+                break;
+            /* Exit the program */
+            case 8: 
+                exitProgram();
+                break;
         }
+        // gotoxy(0, line);
+        // /* Draw the cursor at the new position */
+        // cout << (char)1;
     }
     /* Close customerdata file */
     file.close();
