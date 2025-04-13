@@ -183,12 +183,7 @@ node makeNode() {
     found = false;
     while (!found) {
         cout << "=> Phone storage capacity: ";
-<<<<<<< HEAD
-        cin >> cus.storage;
-=======
         getline(cin, cus.storage);
-        cus.storage = removeSpecialChars(cus.storage);
->>>>>>> main
 
         ifstream myfile("category.txt");
         string line;
@@ -240,8 +235,7 @@ node makeNode() {
         cout << "[ERROR] Unable to open file customerdata.txt" << endl;
     }
 
-    cout << "Customer data updated successfully! Back to menu in 2 seconds\n";
-    sleep(2);
+    cout << "Add customer data successfully!";
 
     return tmp;
 }
@@ -325,12 +319,7 @@ void deleteCustomer(node &a) {
     Customer check;
     string phoneNumber, choice;
     cout << "=> Customer phone number: ";
-<<<<<<< HEAD
     getline(cin, phoneNumber);
-=======
-    getline(cin.ignore(), phoneNumber);
-    phoneNumber = removeSpecialChars(phoneNumber);
->>>>>>> main
     phoneNumber = formatPhoneNumber(phoneNumber);
 
     node current = a;
@@ -495,12 +484,7 @@ void printOneInfo(node &a) {
     bool found = false;
 
     cout << "=> Customer phone number: ";
-<<<<<<< HEAD
     getline(cin, phoneNumber);
-=======
-    getline(cin.ignore(), phoneNumber);
-    phoneNumber = removeSpecialChars(phoneNumber);
->>>>>>> main
     phoneNumber = formatPhoneNumber(phoneNumber);
 
     while (!found) {
@@ -567,13 +551,8 @@ void changeCustomer(node &a) {
     bool found = false;
 
     cout << "=> Customer phone number: ";
-<<<<<<< HEAD
     getline(cin, phoneNumber);
-=======
-    getline(cin.ignore(), phoneNumber);
-    phoneNumber = removeSpecialChars(phoneNumber);
     phoneNumber = formatPhoneNumber(phoneNumber);
->>>>>>> main
 
     while (!found) {
         for (node i = a; i != NULL; i = i->next) {
@@ -623,8 +602,7 @@ void changeCustomer(node &a) {
         }
     }
 
-    cout << "Update customer data successfully! Back to menu in 2 seconds.";
-    sleep(2);
+    cout << "Update customer data successfully!";
 }
 
 /* Function to update items in category.txt */
@@ -665,10 +643,6 @@ void updateCategory() {
 
     cout << "Enter storage capacity to update (exact match): ";
     getline(cin, storage);
-<<<<<<< HEAD
-=======
-    storage = removeSpecialChars(storage);
->>>>>>> main
 
     // Find and update the item
     for (int i = 0; i < count; i++) {
@@ -745,7 +719,6 @@ void updateCategory() {
     cout << "Category file updated successfully.\n";
     cout << "\nUpdated Product Catalog:\n";
     readCategory();
-    sleep(2);
 }
 
 void addNewProduct() {
@@ -753,18 +726,11 @@ void addNewProduct() {
     unordered_set<string> existingProducts = getExistingIphonesWithStorage("category.txt");
 
     // Input product name
-<<<<<<< HEAD
-    while (true) {
-        cout << "=> Product name: ";
-        getline(cin, newProduct.namepro);
-=======
     cout << "=> Product name: ";
     getline(cin.ignore(), newProduct.namepro);
     
     int attempts = 0;
     while (attempts < 5) {
-        newProduct.namepro = removeSpecialChars(newProduct.namepro);
->>>>>>> main
         newProduct.namepro = formatName(newProduct.namepro);
 
         if (!isValidIphoneModel(newProduct.namepro)) {
@@ -787,12 +753,6 @@ void addNewProduct() {
 
     attempts = 0;
     while (attempts < 5) {
-<<<<<<< HEAD
-        cout << "=> Storage capacity (e.g., 64/128/256/512 or 1TB): ";
-        cin >> newProduct.storage;
-=======
-        newProduct.storage = removeSpecialChars(newProduct.storage);
->>>>>>> main
 
         if (newProduct.storage == "1TB") {
             break;
@@ -898,7 +858,6 @@ void addNewProduct() {
     cout << "New product added successfully.\n";
     cout << "\nUpdated Product Catalog:\n";
     readCategory(); // Display updated catalog
-    sleep(2);
 }
 
 void backupData(node head) {
@@ -1163,9 +1122,7 @@ void* runApp(void* arg){
             /* Confirm menu selection */
             case 5:
                 handleMenuOption(static_cast<MenuOption>(line - 10), head);
-                while (kbhit()) {
-                    pressAnyKey();  
-                }
+                pressAnyKey();  
                 clearScreen();
                 printBanner();
                 menu.printMenu(line);
