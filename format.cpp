@@ -47,8 +47,12 @@ bool isValidNumber(const string& str) {
 }
 
 /* Formating Name */
-std::string formatName(std::string& a) {
-    if (a.empty()) return a;
+string formatName(string& a) {
+    if (a.empty()) {
+        cout << "[WARNING] This field cannot be empty. Please enter again: ";
+        getline(cin, a);
+        return formatName(a);
+    }
 
     // Step 1: Remove leading and trailing spaces
     size_t start = 0;
@@ -99,27 +103,13 @@ std::string formatName(std::string& a) {
     return a;
 }
 
-/* [Hien] Not understand clearly yet*/
 /* Formating Phone Number */
 string formatPhoneNumber(string &a) {
-    string phoneNumber;
-    if (countsdt >= 1) {
-        cin >> phoneNumber;
-        if (!isValidPhoneNumber(phoneNumber)) {
-            cout << "Invalid phone number. Please enter again: ";
-            ++countsdt;
-            return formatPhoneNumber(a);
-        } else {
-            a = phoneNumber;
-            return a;
-        }
-    } else {
-        if (!isValidPhoneNumber(a)) {
-            cout << "Invalid phone number. Please enter again: ";
-            ++countsdt;
-            return formatPhoneNumber(a);
-        }
-        return a;
+    // Check if the whole string is numeric or contains space or is empty or is valid prefixes of Vietnamese telecom operators
+    if (a.find(' ') != string::npos || !isValidNumber(a) || a.empty() || !isValidPhoneNumber(a)) {
+        cout << "[WARNING] Invalid phone number. Please enter again: ";
+        getline(cin, a);
+        return formatPhoneNumber(a);
     }
     return a;
 }
@@ -154,19 +144,20 @@ string formatDate(string &a) {
 
 /* Formating Age */
 string formatAge(string &a) {
-    int age;
-    try {
-        age = stoi(a); // Convert string to integer
-    } catch (exception &e) {
-        cout << "Invalid age. Please enter again: ";
-        cin >> a;
-        return formatAge(a); // Recursively call the function if the input is not a number
+    // Check if the whole string is numeric or contains space or is empty
+    if (a.find(' ') != string::npos || !isValidNumber(a) || a.empty()) {
+        cout << "[WARNING] Invalid age. Please enter again: ";
+        getline(cin, a);
+        return formatAge(a);
     }
 
+    int age;
+    age = stoi(a); // Convert string to integer
+    
     // Check if the age is valid
     if (age < 1 || age > 150) {
-        cout << "Invalid age. Please enter again: ";
-        cin >> a;
+        cout << "[WARNING] Invalid age. Please enter again: ";
+        getline(cin, a);
         return formatAge(a); // Recursively call the function if the age is not valid
     }
 

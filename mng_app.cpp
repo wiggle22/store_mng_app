@@ -136,15 +136,13 @@ node makeNode() {
 
     // Input and format customer age
     cout << "=> Customer age: ";
-    cin >> cus.age;
+    getline(cin, cus.age);
     cus.age = formatAge(cus.age);
-    cin.ignore();  // Clear extra character after input
 
     // Input and format customer phone number
     cout << "=> Customer phone number: ";
-    cin >> cus.phonenumber;
+    getline(cin, cus.phonenumber);
     cus.phonenumber = formatPhoneNumber(cus.phonenumber);
-    cin.ignore();  // Clear extra character after input
 
     // Input and validate product item
     bool found = false;
@@ -185,7 +183,12 @@ node makeNode() {
     found = false;
     while (!found) {
         cout << "=> Phone storage capacity: ";
+<<<<<<< HEAD
         cin >> cus.storage;
+=======
+        getline(cin, cus.storage);
+        cus.storage = removeSpecialChars(cus.storage);
+>>>>>>> main
 
         ifstream myfile("category.txt");
         string line;
@@ -322,7 +325,12 @@ void deleteCustomer(node &a) {
     Customer check;
     string phoneNumber, choice;
     cout << "=> Customer phone number: ";
+<<<<<<< HEAD
     getline(cin, phoneNumber);
+=======
+    getline(cin.ignore(), phoneNumber);
+    phoneNumber = removeSpecialChars(phoneNumber);
+>>>>>>> main
     phoneNumber = formatPhoneNumber(phoneNumber);
 
     node current = a;
@@ -381,7 +389,7 @@ void deleteCustomer(node &a) {
 
 /* Function to print header */
 void printHeader() {
-    cout << "--------------------------------------------------------------------------------------------------------------------------------------------------------------\n";
+    cout << "------------------------------------------------------------------------------------------------------------------------------------------------------\n";
     cout << left << setw(30) << "Name";
     cout << left << setw(20) << "Age";
     cout << left << setw(20) << "Phone Number";
@@ -391,7 +399,7 @@ void printHeader() {
     cout << left << setw(20) << "Purchase Date";
     cout << left << setw(20) << "Warranty";
     cout << endl;
-    cout << "--------------------------------------------------------------------------------------------------------------------------------------------------------------\n";
+    cout << "------------------------------------------------------------------------------------------------------------------------------------------------------\n";
 }
 
 /* Function to print customer */
@@ -487,7 +495,12 @@ void printOneInfo(node &a) {
     bool found = false;
 
     cout << "=> Customer phone number: ";
+<<<<<<< HEAD
     getline(cin, phoneNumber);
+=======
+    getline(cin.ignore(), phoneNumber);
+    phoneNumber = removeSpecialChars(phoneNumber);
+>>>>>>> main
     phoneNumber = formatPhoneNumber(phoneNumber);
 
     while (!found) {
@@ -554,7 +567,13 @@ void changeCustomer(node &a) {
     bool found = false;
 
     cout << "=> Customer phone number: ";
+<<<<<<< HEAD
     getline(cin, phoneNumber);
+=======
+    getline(cin.ignore(), phoneNumber);
+    phoneNumber = removeSpecialChars(phoneNumber);
+    phoneNumber = formatPhoneNumber(phoneNumber);
+>>>>>>> main
 
     while (!found) {
         for (node i = a; i != NULL; i = i->next) {
@@ -572,13 +591,13 @@ void changeCustomer(node &a) {
 
                 if (askYesNo("Do you want to change the age")) {
                     cout << "New age: ";
-                    cin >> check.age;
+                    getline(cin, check.age);
                     check.age = formatAge(check.age);
                 }
 
                 if (askYesNo("Do you want to change the phone number")) {
                     cout << "New phone number: ";
-                    cin >> check.phonenumber;
+                    getline(cin, check.phonenumber);
                     check.phonenumber = formatPhoneNumber(check.phonenumber);
                 }
 
@@ -596,7 +615,8 @@ void changeCustomer(node &a) {
             cout << "[WARNING] Invalid phone number." << endl;
             if (askYesNo("Would you like to try again")) {
                 cout << "=> Customer phone number: ";
-                cin >> phoneNumber;
+                getline(cin, phoneNumber);
+                phoneNumber = formatPhoneNumber(phoneNumber);
             } else {
                 break;
             }
@@ -645,6 +665,10 @@ void updateCategory() {
 
     cout << "Enter storage capacity to update (exact match): ";
     getline(cin, storage);
+<<<<<<< HEAD
+=======
+    storage = removeSpecialChars(storage);
+>>>>>>> main
 
     // Find and update the item
     for (int i = 0; i < count; i++) {
@@ -729,29 +753,46 @@ void addNewProduct() {
     unordered_set<string> existingProducts = getExistingIphonesWithStorage("category.txt");
 
     // Input product name
+<<<<<<< HEAD
     while (true) {
         cout << "=> Product name: ";
         getline(cin, newProduct.namepro);
+=======
+    cout << "=> Product name: ";
+    getline(cin.ignore(), newProduct.namepro);
+    
+    int attempts = 0;
+    while (attempts < 5) {
+        newProduct.namepro = removeSpecialChars(newProduct.namepro);
+>>>>>>> main
         newProduct.namepro = formatName(newProduct.namepro);
 
-        if (newProduct.namepro.empty()) {
-            cout << "[WARNING] Product name cannot be empty.\n";
-            continue;
-        }
-
         if (!isValidIphoneModel(newProduct.namepro)) {
-            cout << "[WARNING] Invalid product name. Please enter a valid iPhone model.\n";
+            cout << "[WARNING] Invalid product name. Please enter a valid iPhone model: ";
+            getline(cin, newProduct.namepro);
+            attempts++;
             continue;
         }
-
         break;
     }
 
+    if (attempts == 5) {
+        cout << "[ERROR] Too many invalid attempts. Returning to menu.\n";
+        return;
+    }
+
     // Input storage capacity 
-    int attempts = 0;
+    cout << "=> Storage capacity (e.g., 64/128/256/512 or 1TB): ";
+    getline(cin, newProduct.storage);
+
+    attempts = 0;
     while (attempts < 5) {
+<<<<<<< HEAD
         cout << "=> Storage capacity (e.g., 64/128/256/512 or 1TB): ";
         cin >> newProduct.storage;
+=======
+        newProduct.storage = removeSpecialChars(newProduct.storage);
+>>>>>>> main
 
         if (newProduct.storage == "1TB") {
             break;
@@ -760,7 +801,8 @@ void addNewProduct() {
         if (newProduct.storage == "64" || newProduct.storage == "128" || newProduct.storage == "256" || newProduct.storage == "512" ) {
             // do nothing
         } else {
-            cout << "[WARNING] Invalid storage capacity.\n";
+            cout << "[WARNING] Invalid storage capacity. Please enter again: ";
+            getline(cin, newProduct.storage);
             attempts++;
             continue;
         }
@@ -782,13 +824,14 @@ void addNewProduct() {
     }
 
     // Input price
+    cout << "=> New price (e.g., 36000000): ";
+    getline(cin, newProduct.price);
+
     attempts = 0;
     while(attempts < 5){
-        cout << "=> New price (e.g., 36000000): ";
-        cin >> newProduct.price;
-
         if (!isValidNumber(newProduct.price) || (newProduct.price).empty()) {
-            cout << "[WARNING] Invalid price. Please enter a numeric value.\n";
+            cout << "[WARNING] Invalid price. Please enter a numeric value: ";
+            getline(cin, newProduct.price);
             attempts++;
             continue;
         }
@@ -803,13 +846,15 @@ void addNewProduct() {
     }
 
     // Input warranty
+    cout << "=> Warranty period (in years, e.g., 2): ";
+    getline(cin, newProduct.warranty);
+
     attempts = 0;
     while(attempts < 5){
-        cout << "=> Warranty period (in years, e.g., 2): ";
-        cin >> newProduct.warranty;
         // Validate warranty input
         if (!isValidNumber(newProduct.warranty) || (newProduct.warranty.empty())) {
-            cout << "[WARNING] Invalid warranty period. Please enter a numeric value.\n";
+            cout << "[WARNING] Invalid warranty period. Please enter a numeric value: ";
+            getline(cin, newProduct.warranty);
             attempts++;
             continue;
         }
