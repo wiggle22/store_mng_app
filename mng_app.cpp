@@ -235,7 +235,7 @@ node makeNode() {
         cout << "[ERROR] Unable to open file customerdata.txt" << endl;
     }
 
-    cout << "Add customer data successfully!";
+    cout << "Add customer data successfully!\n";
 
     return tmp;
 }
